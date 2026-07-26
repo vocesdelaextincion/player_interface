@@ -44,7 +44,9 @@ function loadRecordings(): Recording[] {
     const imageSrc = resolveAsset(imageFiles, raw.image.replace(/^media\//, ''))
 
     if (!audioSrc || !imageSrc) {
-      console.warn(`[recordings] skipping "${raw.id}" — missing ${!audioSrc ? raw.audio : raw.image}`)
+      console.warn(
+        `[recordings] skipping "${raw.id}" — missing ${!audioSrc ? raw.audio : raw.image}`
+      )
       continue
     }
 

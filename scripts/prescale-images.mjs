@@ -28,7 +28,9 @@ if (!existsSync(sourceDirArg)) {
 
 mkdirSync(outputDir, { recursive: true })
 
-const files = readdirSync(sourceDirArg).filter((name) => EXTENSIONS.has(extname(name).toLowerCase()))
+const files = readdirSync(sourceDirArg).filter((name) =>
+  EXTENSIONS.has(extname(name).toLowerCase())
+)
 
 if (files.length === 0) {
   console.warn(`No images found in ${sourceDirArg}`)
