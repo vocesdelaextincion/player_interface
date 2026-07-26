@@ -16,6 +16,10 @@ export function AppShell(): React.JSX.Element {
   const previousStateRef = useRef<ScreenState>('idle')
   const { isPlaying, requestStop } = usePlayback()
 
+  // F4 from Locked also routes here (into 'admin'), landing on the same Close/Restart/Lock
+  // menu as F4 from Idle/Active. ARCHITECTURE.md's diagram draws Locked's unlock as a direct
+  // arrow to Idle instead — open question for Stage 6 (password prompt) whether that means
+  // "skip the menu, auto-resolve to Idle" or is just diagram shorthand. See STAGES.md Stage 6.
   const openAdmin = useCallback(() => {
     setState((current) => {
       if (current === 'admin') return current

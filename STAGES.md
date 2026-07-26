@@ -4,47 +4,64 @@ Assumption: TypeScript for the app (consistent with the other `voces` projects, 
 
 Each stage should be shippable/demoable on its own before moving to the next.
 
-## Stage 1 — Scaffolding & tooling
-- [ ] Electron + React + TypeScript project (Vite-based)
-- [ ] CSS Modules wired up
-- [ ] Framer Motion installed
-- [ ] Fraunces + Inter bundled locally, `@font-face` set up
-- [ ] Design tokens from `DESIGN.md` as a theme file (colors, type scale, motion durations)
-- [ ] Kiosk window: fullscreen, frameless, no menu bar, cursor hidden, devtools/right-click/text-select/pinch-zoom disabled
-- [ ] `dev` / `build` / `package` npm scripts
+## Stage 1 — Scaffolding & tooling ✅
+- [x] Electron + React + TypeScript project (Vite-based)
+- [x] CSS Modules wired up
+- [x] Framer Motion installed
+- [x] Fraunces + Inter bundled locally, `@font-face` set up
+- [x] Design tokens from `DESIGN.md` as a theme file (colors, type scale, motion durations)
+- [x] Kiosk window: fullscreen, frameless, no menu bar, cursor hidden, devtools/right-click/text-select/pinch-zoom disabled
+- [x] `dev` / `build` / `package` npm scripts
 
-## Stage 2 — Content pipeline
-- [ ] `content/recordings.json` schema + loader
-- [ ] `media/audio`, `media/images` folders with a few sample recordings for dev
-- [ ] Loader skips entries with missing/unloadable files (console warning, no crash)
-- [ ] Build-time script to pre-scale images to screen resolution
+Note: this machine's default Node (v26) silently breaks Electron's own binary extraction — no
+error, it just truncates. Node 22 LTS is pinned via `.nvmrc`/`.node-version`/`engines`. If a fresh
+`bun install` ever produces an `Error: Electron uninstall` on `bun run dev` again, re-run
+`node_modules/electron/install.js` under Node 22.
 
-## Stage 3 — App shell & state machine
-- [ ] Idle / Active / Admin / Locked container, per `ARCHITECTURE.md`
-- [ ] Global F4 listener → Admin prompt from any state, stops playback
-- [ ] Esc cancels Admin prompt back to previous state
-- [ ] 45s inactivity timer, Active → Idle (deferred while a track plays)
-- [ ] Transitions wired to `motion-state` token
+## Stage 2 — Content pipeline ✅
+- [x] `content/recordings.json` schema + loader
+- [x] `media/audio`, `media/images` folders with a few sample recordings for dev
+- [x] Loader skips entries with missing/unloadable files (console warning, no crash)
+- [x] Build-time script to pre-scale images to screen resolution
 
-## Stage 4 — Idle screen
-- [ ] Full-bleed image crossfade cycle
-- [ ] Ken Burns pan/zoom, with a config flag to fall back to crossfade-only if it stutters on the real hardware
-- [ ] Any touch → Active
+Sample media is placeholder only (tone mp3s, labeled color blocks) — swap for real recordings/photography whenever it's sourced.
 
-## Stage 5 — Active screen: browse + player
-- [ ] Full-bleed carousel, one recording centered
-- [ ] Left/right arrow nav (tap only, no gestures)
-- [ ] Tag-filter chip row
-- [ ] Tap hero image → play/pause in place, overlay controls + scrub bar
-- [ ] Single reusable `<audio>` element; switching recordings stops the current one
-- [ ] Track end: stop, stay put (no auto-advance)
-- [ ] Scrub bar seekable by touch
+## Stage 3 — App shell & state machine ✅
+- [x] Idle / Active / Admin / Locked container, per `ARCHITECTURE.md`
+- [x] Global F4 listener → Admin prompt from any state, stops playback
+- [x] Esc cancels Admin prompt back to previous state
+- [x] 45s inactivity timer, Active → Idle (deferred while a track plays)
+- [x] Transitions wired to `motion-state` token
 
-## Stage 6 — Admin & Locked screens
+## Stage 4 — Idle screen ✅
+- [x] Full-bleed image crossfade cycle
+- [x] Ken Burns pan/zoom, with a config flag to fall back to crossfade-only if it stutters on the real hardware
+- [x] Any touch → Active
+
+## Stage 5 — Active screen: browse + player ✅
+- [x] Full-bleed carousel, one recording centered
+- [x] Left/right arrow nav (tap only, no gestures)
+- [x] Tag-filter chip row
+- [x] Tap hero image → play/pause in place, overlay controls + scrub bar
+- [x] Single reusable `<audio>` element; switching recordings stops the current one
+- [x] Track end: stop, stay put (no auto-advance)
+- [x] Scrub bar seekable by touch
+
+## Stage 6 — Admin & Locked screens ← next
 - [ ] Password prompt (toned-down theme), shake feedback on wrong password
 - [ ] Actions: Close app, Restart app, Lock
 - [ ] Locked: block all touch, listen only for F4
 - [ ] Hardcoded password constant
+
+**Open decision to resolve before/while building this stage:** `ARCHITECTURE.md`'s diagram shows
+`Locked --F4+password--> Idle` as a direct arrow, separate from the generic `any --F4+password-->
+Admin` transition. Stage 3's shell currently routes F4-from-Locked through the same generic Admin
+state (see the comment in `src/renderer/src/state/AppShell.tsx` near `openAdmin`) — meaning right
+now, successfully authenticating from Locked lands on the same Close/Restart/Lock menu as
+authenticating from Idle/Active, not a direct bounce to Idle. Need to decide: does unlocking from
+Locked skip the action menu entirely (auto-resolve to Idle), or is that arrow just diagram
+shorthand for "goes through the same password gate"? This determines real logic in the password
+prompt component, not just the shell.
 
 ## Stage 7 — Styling pass
 - [ ] Full `DESIGN.md` token set applied across every screen
