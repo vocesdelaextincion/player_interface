@@ -1,0 +1,34 @@
+[
+  {
+    "id": "jaguar-01",
+    "title": "Rugido nocturno",
+    "species": "Jaguar",
+    "tags": ["mamiferos"],
+    "audio": "media/audio/sample-jaguar.mp3",
+    "image": "media/images/sample-jaguar.jpg"
+  },
+  {
+    "id": "quetzal-01",
+    "title": "Canto del amanecer",
+    "species": "Quetzal",
+    "tags": ["aves"],
+    "audio": "media/audio/sample-quetzal.mp3",
+    "image": "media/images/sample-quetzal.jpg"
+  },
+  {
+    "id": "rana-01",
+    "title": "Coro de lluvia",
+    "species": "Rana de cristal",
+    "tags": ["anfibios"],
+    "audio": "media/audio/sample-rana.mp3",
+    "image": "media/images/sample-rana.jpg"
+  },
+  {
+    "id": "broken-01",
+    "title": "Grabacion perdida",
+    "species": "Desconocida",
+    "tags": ["mamiferos"],
+    "audio": "media/audio/does-not-exist.mp3",
+    "image": "media/images/sample-jaguar.jpg"
+  }
+]
