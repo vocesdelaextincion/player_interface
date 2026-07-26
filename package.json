@@ -4,6 +4,9 @@
   "description": "Museum kiosk player for Voces de la Extincion recordings",
   "main": "./out/main/index.js",
   "author": "Voces de la Extincion",
+  "engines": {
+    "node": "22.22.2"
+  },
   "scripts": {
     "format": "prettier --write .",
     "lint": "eslint --cache .",
