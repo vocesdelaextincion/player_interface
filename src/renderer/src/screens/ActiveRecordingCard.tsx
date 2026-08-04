@@ -25,7 +25,7 @@ export function ActiveRecordingCard({
     onSeek(fraction)
   }
 
-  const progress = durationSec > 0 ? (currentTime / durationSec) * 100 : 0
+  const progress = durationSec > 0 ? Math.min(1, currentTime / durationSec) : 0
 
   return (
     <div className={styles.card} onClick={onTogglePlay}>
@@ -51,7 +51,7 @@ export function ActiveRecordingCard({
           onPointerUp={(event) => event.currentTarget.releasePointerCapture(event.pointerId)}
         >
           <div className={styles.scrubBar}>
-            <div className={styles.scrubFill} style={{ width: `${progress}%` }} />
+            <div className={styles.scrubFill} style={{ transform: `scaleX(${progress})` }} />
           </div>
         </div>
         <span className={styles.time}>

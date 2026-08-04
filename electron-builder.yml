@@ -9,15 +9,32 @@ files:
   - '!{.eslintcache,eslint.config.mjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
   - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
+  # Vite inlines audio/images/fonts into out/renderer/assets as hashed files, so shipping
+  # the sources too would just double the package size.
+  - '!{media,content,scripts,build}/*'
+  - '!{ARCHITECTURE.md,DESIGN.md,STAGES.md,directive.md}'
 asarUnpack:
   - resources/**
 win:
   executableName: player-interface
+  # x64 only — Electron 39 publishes no ia32 Windows binary. See README "Target machine".
+  # zip is the kiosk deliverable (unpack, run the .exe — no installer, no admin rights) and
+  # is the only one of the two that builds off-Windows. nsis needs wine or a Windows box.
+  target:
+    - target: zip
+      arch: [x64]
+    - target: nsis
+      arch: [x64]
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
+  # Staff install this on a shared museum machine; let them pick the drive and
+  # avoid a per-user install that a different Windows login can't see.
+  oneClick: false
+  perMachine: true
+  allowToChangeInstallationDirectory: true
 mac:
   entitlementsInherit: build/entitlements.mac.plist
   notarize: false

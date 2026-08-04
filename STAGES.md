@@ -75,7 +75,24 @@ Still judged against placeholder color blocks — the overlay-gradient legibilit
 look once real photography lands.
 
 ## Stage 8 — Stability & packaging
-- [ ] Multi-hour soak test on the real (or comparable) machine, watch memory
-- [ ] Confirm animations only touch `transform`/`opacity`, one full-bleed animated layer at a time
-- [ ] Electron build/package for the target OS
-- [ ] Manual pass against the full `ARCHITECTURE.md` behavior list
+- [x] Confirm animations only touch `transform`/`opacity`, one full-bleed animated layer at a time
+- [x] Electron build/package for the target OS
+- [ ] Multi-hour soak test on the real (or comparable) machine, watch memory — **needs hardware**
+- [ ] Manual pass against the full `ARCHITECTURE.md` behavior list — **needs hardware**, see `CHECKLIST.md`
+
+Animation audit: no CSS transitions or keyframes exist at all — every animation goes through Framer
+Motion, and all of them move only `opacity`, `scale`, `x`, `y`. The one violation found was the scrub
+bar's progress fill, which drove `width` ~4x/sec for the length of every track; it's now `scaleX`.
+Listener/timer cleanup is balanced (10 registrations, 10 teardowns).
+
+Caveat on "one full-bleed animated layer": a crossfade and a slide both need two layers by
+definition, so Idle composites two for 2.5s of every 27.5s cycle, and the carousel for 600ms per
+move. Both are transform/opacity, so they stay on the compositor. `kenBurnsEnabled = false` collapses
+the Idle case to opacity-only if the real hardware struggles.
+
+Packaging: the deliverable is `bun run build:win:zip` → a 127MB zip, unpacked and run directly on the
+kiosk. `framer-motion` moved to `devDependencies` (the renderer bundle already inlines it, and main
+and preload never import it), which cut the asar from 9.1MB to 1.2MB.
+
+The two open items are genuinely blocked on the physical machine — a soak test and a touch pass can't
+be faked from a build box. `CHECKLIST.md` is written so whoever has the kiosk can run them.
