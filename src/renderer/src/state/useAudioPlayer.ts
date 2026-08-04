@@ -12,7 +12,7 @@ interface AudioPlayer {
 
 // Owns the one <audio> element the Active screen reuses across every recording —
 // only its `src` changes as the carousel moves (see ARCHITECTURE.md "Long-run stability").
-export function useAudioPlayer(src: string | undefined): AudioPlayer {
+export function useAudioPlayer(src: string | undefined, gain = 1): AudioPlayer {
   const audioElRef = useRef<HTMLAudioElement>(null)
   const [isPlaying, setLocalPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
@@ -60,6 +60,13 @@ export function useAudioPlayer(src: string | undefined): AudioPlayer {
     el.pause()
     el.currentTime = 0
   }, [src])
+
+  // Per-recording level trim, so the catalog plays at a consistent loudness (see recordings.ts).
+  // Applied alongside src so a new track never plays a frame at the previous track's level.
+  useEffect(() => {
+    const el = audioElRef.current
+    if (el) el.volume = gain
+  }, [gain, src])
 
   useEffect(() => {
     const el = audioElRef.current

@@ -49,10 +49,22 @@ which `.gitignore` excludes.
   "title": "string",
   "species": "string",
   "tags": ["string"],
-  "audio": "media/audio/xxx.mp3",
+  "gainDb": -9.5,
+  "audio": "media/audio/xxx.flac",
   "image": "media/images/xxx.jpg"
 }
 ```
+
+`gainDb` (optional, defaults to 0) trims playback level per recording. Field recordings arrive at
+very different loudnesses — this catalog spanned 23 LU — and on a kiosk that means a visitor sets a
+comfortable volume and the next track is either inaudible or startling. Trimming at playback keeps
+the audio files themselves untouched, so levels can be retuned by editing a number instead of
+re-encoding.
+
+Because HTML5 audio volume only attenuates (0-1, no boost), **`gainDb` is always ≤ 0 and the shared
+target must be the quietest track in the catalog**. A track recorded far below the others can't be
+raised this way and has to be corrected at the file level first — as `alicuco-grillos` was, having
+been captured 30 dB below full scale.
 
 Catalog is small (<20 recordings) — no search/pagination needed.
 

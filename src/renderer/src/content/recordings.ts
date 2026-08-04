@@ -5,6 +5,8 @@ export interface Recording {
   title: string
   species: string
   tags: string[]
+  /** Linear playback volume, 0-1. Derived from `gainDb`. */
+  gain: number
   audioSrc: string
   imageSrc: string
 }
@@ -14,8 +16,19 @@ interface RawRecording {
   title: string
   species: string
   tags: string[]
+  gainDb?: number
   audio: string
   image: string
+}
+
+// The catalog's tracks were recorded at wildly different levels (a 23 LU spread), which on a
+// kiosk means a visitor sets a comfortable volume and the next track is inaudible or startling.
+// `gainDb` trims each one to a common loudness at playback, leaving the files themselves
+// untouched. HTML5 audio volume can only attenuate, so gainDb is always <= 0 and the shared
+// target has to be the quietest track — see ARCHITECTURE.md "Content".
+function toLinearGain(gainDb: number | undefined): number {
+  if (gainDb === undefined) return 1
+  return Math.min(1, Math.max(0, 10 ** (gainDb / 20)))
 }
 
 // Eager: the catalog is small (<20) and this only runs once, at startup.
@@ -57,6 +70,7 @@ function loadRecordings(): Recording[] {
       title: raw.title,
       species: raw.species,
       tags: raw.tags,
+      gain: toLinearGain(raw.gainDb),
       audioSrc,
       imageSrc
     })

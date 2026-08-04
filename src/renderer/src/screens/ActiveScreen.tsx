@@ -28,7 +28,8 @@ export function ActiveScreen(): React.JSX.Element {
   const current = filtered[safeIndex]
 
   const { audioElRef, isPlaying, currentTime, durationSec, toggle, seek } = useAudioPlayer(
-    current?.audioSrc
+    current?.audioSrc,
+    current?.gain
   )
 
   function goTo(step: number): void {

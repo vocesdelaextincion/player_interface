@@ -4,6 +4,7 @@
     "title": "Canto del kakuy",
     "species": "Kakuy",
     "tags": ["aves"],
+    "gainDb": -9.5,
     "audio": "media/audio/kakui.flac",
     "image": "media/images/sample-quetzal.jpg"
   },
@@ -12,6 +13,7 @@
     "title": "Alicucu entre grillos",
     "species": "Alicucu",
     "tags": ["aves"],
+    "gainDb": 0.0,
     "audio": "media/audio/alicuco-grillos.flac",
     "image": "media/images/sample-jaguar.jpg"
   },
@@ -20,6 +22,7 @@
     "title": "Coro intenso",
     "species": "Grillos",
     "tags": ["insectos"],
+    "gainDb": -0.8,
     "audio": "media/audio/grillos-intenso.flac",
     "image": "media/images/sample-rana.jpg"
   },
@@ -28,6 +31,7 @@
     "title": "Lluvia sobre el galpón",
     "species": "Paisaje sonoro",
     "tags": ["ambiente"],
+    "gainDb": -0.6,
     "audio": "media/audio/lluvia-galpon.flac",
     "image": "media/images/sample-rana.jpg"
   },
@@ -36,6 +40,7 @@
     "title": "Mañana calurosa",
     "species": "Paisaje sonoro",
     "tags": ["ambiente"],
+    "gainDb": -7.2,
     "audio": "media/audio/manana-calurosa.flac",
     "image": "media/images/sample-quetzal.jpg"
   }
