@@ -1,0 +1,60 @@
+/* Toned-down staff mode: flat, static, no ambient motion (see DESIGN.md "Layout — per state"). */
+
+.screen {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  background: var(--color-bg);
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: 40px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.button {
+  min-width: 320px;
+  min-height: var(--touch-target-min);
+  padding: 0 32px;
+  border: 1px solid var(--color-accent);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-text);
+  font-family: var(--font-ui);
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.button:active {
+  background: var(--color-accent);
+  color: var(--color-bg);
+}
+
+.buttonDanger {
+  composes: button;
+  border-color: var(--color-text-muted);
+  color: var(--color-text-muted);
+}
+
+.buttonDanger:active {
+  background: var(--color-text-muted);
+  color: var(--color-bg);
+}
+
+.hint {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--color-text-muted);
+}

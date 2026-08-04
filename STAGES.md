@@ -47,23 +47,21 @@ Sample media is placeholder only (tone mp3s, labeled color blocks) — swap for 
 - [x] Track end: stop, stay put (no auto-advance)
 - [x] Scrub bar seekable by touch
 
-## Stage 6 — Admin & Locked screens ← next
-- [ ] Password prompt (toned-down theme), shake feedback on wrong password
-- [ ] Actions: Close app, Restart app, Lock
-- [ ] Locked: block all touch, listen only for F4
-- [ ] Hardcoded password constant
+## Stage 6 — Admin & Locked screens ✅
+- [x] Password prompt (toned-down theme), shake feedback on wrong password
+- [x] Actions: Close app, Restart app, Lock
+- [x] Locked: block all touch, listen only for F4
+- [x] Hardcoded password constant
 
-**Open decision to resolve before/while building this stage:** `ARCHITECTURE.md`'s diagram shows
-`Locked --F4+password--> Idle` as a direct arrow, separate from the generic `any --F4+password-->
-Admin` transition. Stage 3's shell currently routes F4-from-Locked through the same generic Admin
-state (see the comment in `src/renderer/src/state/AppShell.tsx` near `openAdmin`) — meaning right
-now, successfully authenticating from Locked lands on the same Close/Restart/Lock menu as
-authenticating from Idle/Active, not a direct bounce to Idle. Need to decide: does unlocking from
-Locked skip the action menu entirely (auto-resolve to Idle), or is that arrow just diagram
-shorthand for "goes through the same password gate"? This determines real logic in the password
-prompt component, not just the shell.
+Resolved: unlocking from Locked skips the action menu and goes straight to Idle, per
+`ARCHITECTURE.md`'s direct arrow. Locked is screen-cleaning mode, so the staff intent on unlock is
+"resume normal operation"; F4 reopens the menu if they actually wanted it. Both entry paths share
+one password gate — `AdminScreen` branches on `cameFromLocked`.
 
-## Stage 7 — Styling pass
+Close/Restart are the first renderer actions needing the main process, so this stage added
+`app:quit` / `app:restart` IPC (`src/main/index.ts`) exposed as `window.api` via the preload.
+
+## Stage 7 — Styling pass ← next
 - [ ] Full `DESIGN.md` token set applied across every screen
 - [ ] Type scale applied (Fraunces display / Inter UI)
 - [ ] Touch-target audit (64px minimum everywhere)

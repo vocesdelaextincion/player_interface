@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { usePlayback } from './usePlayback'
 import { IdleScreen } from '../screens/IdleScreen'
@@ -9,23 +9,29 @@ import { duration, easeCinematic } from '../theme'
 
 type ScreenState = 'idle' | 'active' | 'admin' | 'locked'
 
+// `previous` is what Esc returns to, and it decides where a successful password lands —
+// so it has to be state, not a ref: the Admin render reads it.
+interface Screen {
+  current: ScreenState
+  previous: ScreenState
+}
+
 const INACTIVITY_TIMEOUT_MS = 45_000
 
 export function AppShell(): React.JSX.Element {
-  const [state, setState] = useState<ScreenState>('idle')
-  const previousStateRef = useRef<ScreenState>('idle')
+  const [screen, setScreen] = useState<Screen>({ current: 'idle', previous: 'idle' })
+  const { current: state, previous: previousState } = screen
   const { isPlaying, requestStop } = usePlayback()
 
-  // F4 from Locked also routes here (into 'admin'), landing on the same Close/Restart/Lock
-  // menu as F4 from Idle/Active. ARCHITECTURE.md's diagram draws Locked's unlock as a direct
-  // arrow to Idle instead — open question for Stage 6 (password prompt) whether that means
-  // "skip the menu, auto-resolve to Idle" or is just diagram shorthand. See STAGES.md Stage 6.
+  const goTo = useCallback((next: ScreenState) => {
+    setScreen((s) => ({ current: next, previous: s.current }))
+  }, [])
+
+  // F4 from Locked routes here too, but only as far as the password gate: AdminScreen reads
+  // `cameFromLocked` and resolves straight to Idle on success, per ARCHITECTURE.md's direct
+  // `Locked --F4+password--> Idle` arrow.
   const openAdmin = useCallback(() => {
-    setState((current) => {
-      if (current === 'admin') return current
-      previousStateRef.current = current
-      return 'admin'
-    })
+    setScreen((s) => (s.current === 'admin' ? s : { current: 'admin', previous: s.current }))
     requestStop()
   }, [requestStop])
 
@@ -35,7 +41,7 @@ export function AppShell(): React.JSX.Element {
       if (event.key === 'F4') {
         openAdmin()
       } else if (event.key === 'Escape') {
-        setState((current) => (current === 'admin' ? previousStateRef.current : current))
+        setScreen((s) => (s.current === 'admin' ? { current: s.previous, previous: 'admin' } : s))
       }
     }
     window.addEventListener('keydown', handleKeydown)
@@ -46,11 +52,11 @@ export function AppShell(): React.JSX.Element {
   useEffect(() => {
     if (state !== 'active' || isPlaying) return
 
-    let timer = setTimeout(() => setState('idle'), INACTIVITY_TIMEOUT_MS)
+    let timer = setTimeout(() => goTo('idle'), INACTIVITY_TIMEOUT_MS)
 
     function resetTimer(): void {
       clearTimeout(timer)
-      timer = setTimeout(() => setState('idle'), INACTIVITY_TIMEOUT_MS)
+      timer = setTimeout(() => goTo('idle'), INACTIVITY_TIMEOUT_MS)
     }
 
     window.addEventListener('pointerdown', resetTimer)
@@ -58,7 +64,7 @@ export function AppShell(): React.JSX.Element {
       clearTimeout(timer)
       window.removeEventListener('pointerdown', resetTimer)
     }
-  }, [state, isPlaying])
+  }, [state, isPlaying, goTo])
 
   return (
     <AnimatePresence mode="wait">
@@ -69,9 +75,15 @@ export function AppShell(): React.JSX.Element {
         exit={{ opacity: 0 }}
         transition={{ duration: duration.state, ease: easeCinematic }}
       >
-        {state === 'idle' && <IdleScreen onActivate={() => setState('active')} />}
+        {state === 'idle' && <IdleScreen onActivate={() => goTo('active')} />}
         {state === 'active' && <ActiveScreen />}
-        {state === 'admin' && <AdminScreen onLock={() => setState('locked')} />}
+        {state === 'admin' && (
+          <AdminScreen
+            cameFromLocked={previousState === 'locked'}
+            onUnlock={() => goTo('idle')}
+            onLock={() => goTo('locked')}
+          />
+        )}
         {state === 'locked' && <LockedScreen />}
       </motion.div>
     </AnimatePresence>
