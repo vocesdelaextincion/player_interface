@@ -90,9 +90,15 @@ definition, so Idle composites two for 2.5s of every 27.5s cycle, and the carous
 move. Both are transform/opacity, so they stay on the compositor. `kenBurnsEnabled = false` collapses
 the Idle case to opacity-only if the real hardware struggles.
 
-Packaging: the deliverable is `bun run build:win:zip` → a 127MB zip, unpacked and run directly on the
-kiosk. `framer-motion` moved to `devDependencies` (the renderer bundle already inlines it, and main
-and preload never import it), which cut the asar from 9.1MB to 1.2MB.
+Packaging: the deliverable is `bun run build:win:zip`, unpacked and run directly on the kiosk.
+`framer-motion` moved to `devDependencies` (the renderer bundle already inlines it, and main and
+preload never import it), which cut the asar from 9.1MB to 1.2MB.
+
+Electron pinned back to 22.3.27 once the kiosk was confirmed as Windows 8 — 23 dropped that OS. The
+pin also restored 32-bit Windows, so builds now cover Win 7/8/8.1/10/11 (x64 + ia32), Linux AppImage,
+and macOS from one config. `electron.vite.config.ts` pins `chrome108`/`node16` targets to match;
+without them the build succeeds but the kiosk shows a blank window. The `deb` target was dropped —
+it needs a maintainer email nobody has supplied.
 
 The two open items are genuinely blocked on the physical machine — a soak test and a touch pass can't
 be faked from a build box. `CHECKLIST.md` is written so whoever has the kiosk can run them.

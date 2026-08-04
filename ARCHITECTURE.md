@@ -60,7 +60,7 @@ Entries with a missing or unloadable audio/image file are skipped at load (conso
 - Fonts bundled locally (no network, so no Google Fonts at runtime).
 - UI text: Spanish only.
 - Hardware assumption: touchscreen for visitors + physical keyboard attached (F4 and password entry). Fixed landscape resolution — no responsive breakpoints.
-- Target OS: **Windows 10 x64 or newer**. Electron 39 dropped Windows 7/8/8.1 and ships no 32-bit Windows binary — see `README.md` "Target machine" for the Electron 22 fallback if the kiosk turns out to be older.
+- Target OS: **Windows 8**. Electron is pinned to 22.3.27, the last release supporting it — which also covers Windows 7/8.1/10/11 (32- and 64-bit), Linux, and macOS. Do not upgrade Electron past 22; see `README.md` "Target machine".
 - No auto-launch, no crash watchdog — staff starts the app manually.
 - Admin password hardcoded in source. It's a visitor deterrent, not a real security boundary.
 

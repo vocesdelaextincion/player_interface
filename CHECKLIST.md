@@ -5,7 +5,8 @@ a real keyboard, or hours of wall-clock time — none of it can be verified from
 
 ## Before the first install
 
-- [ ] Windows version is 10 or newer, and 64-bit (see `README.md` — 7/8/8.1 and 32-bit do not run)
+- [ ] Machine architecture checked — ship the `ia32` build if unsure, it runs on both
+- [ ] App actually launches on the Windows 8 machine (Electron 22 pin; never verified on real hardware)
 - [ ] Screen resolution noted, and images prescaled to it (`bun run prescale-images <sourceDir>`)
 - [ ] Admin password changed from the default in `src/renderer/src/admin.ts`
 - [ ] Real recordings and photography in `media/`, `content/recordings.json` updated

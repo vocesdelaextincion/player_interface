@@ -19,10 +19,10 @@
     "build": "bun run typecheck && electron-vite build",
     "postinstall": "electron-builder install-app-deps",
     "build:unpack": "bun run build && electron-builder --dir",
-    "build:win": "bun run build && electron-builder --win",
-    "build:win:zip": "bun run build && electron-builder --win zip",
-    "build:mac": "electron-vite build && electron-builder --mac",
-    "build:linux": "electron-vite build && electron-builder --linux"
+    "build:win": "bun run build && electron-builder --win --x64 --ia32",
+    "build:win:zip": "bun run build && electron-builder --win zip --x64 --ia32",
+    "build:mac": "bun run build && electron-builder --mac",
+    "build:linux": "bun run build && electron-builder --linux"
   },
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.2",
@@ -36,7 +36,7 @@
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
-    "electron": "^39.2.6",
+    "electron": "22.3.27",
     "electron-builder": "^26.0.12",
     "electron-vite": "^5.0.0",
     "eslint": "^9.39.1",

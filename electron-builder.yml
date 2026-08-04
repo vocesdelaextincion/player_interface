@@ -17,14 +17,16 @@ asarUnpack:
   - resources/**
 win:
   executableName: player-interface
-  # x64 only — Electron 39 publishes no ia32 Windows binary. See README "Target machine".
+  # ia32 as well as x64: the kiosk is a Windows 8 machine and may well be 32-bit. Electron 22
+  # still ships both. An ia32 build also runs on x64 Windows, so it's the safe one if nobody
+  # can confirm the architecture.
   # zip is the kiosk deliverable (unpack, run the .exe — no installer, no admin rights) and
   # is the only one of the two that builds off-Windows. nsis needs wine or a Windows box.
   target:
     - target: zip
-      arch: [x64]
+      arch: [x64, ia32]
     - target: nsis
-      arch: [x64]
+      arch: [x64, ia32]
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}
@@ -41,9 +43,12 @@ mac:
 dmg:
   artifactName: ${name}-${version}.${ext}
 linux:
+  # AppImage only. The deb target additionally requires a maintainer email, which nobody has
+  # supplied — set `author` to `{ name, email }` in package.json (or `linux.maintainer` here)
+  # and add `deb` back if a Debian package is ever wanted. AppImage is self-contained and needs
+  # no install, which suits the kiosk better anyway.
   target:
     - AppImage
-    - deb
   category: Utility
 appImage:
   artifactName: ${name}-${version}.${ext}
