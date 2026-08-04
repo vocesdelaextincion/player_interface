@@ -29,11 +29,17 @@ No backend, no internet. Audio and images are bundled in the repo.
 
 ```
 media/
-  audio/       *.mp3
+  audio/       *.flac (*.mp3 also accepted)
   images/      *.jpg
 content/
   recordings.json
 ```
+
+Audio is lossless FLAC — the kiosk plays from local disk with no bandwidth constraint, so there's
+no reason to throw quality away. The loader's glob is **extension-scoped** (`*.{flac,mp3}`): an
+unfiltered glob bundles every file in the folder, so uncompressed masters parked next to the
+deliverables silently inflate the build. Keep masters out of `media/audio/` or leave them as `.wav`,
+which `.gitignore` excludes.
 
 `recordings.json` — flat array, one entry per recording:
 

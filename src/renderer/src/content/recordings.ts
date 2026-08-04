@@ -19,7 +19,9 @@ interface RawRecording {
 }
 
 // Eager: the catalog is small (<20) and this only runs once, at startup.
-const audioFiles = import.meta.glob('../../../../media/audio/*', {
+// Extension-scoped on purpose: an unfiltered glob bundles *everything* sitting in the folder,
+// so leaving uncompressed masters next to the deliverables silently inflates the build.
+const audioFiles = import.meta.glob('../../../../media/audio/*.{flac,mp3}', {
   eager: true,
   query: '?url',
   import: 'default'

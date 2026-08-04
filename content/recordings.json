@@ -1,34 +1,42 @@
 [
   {
-    "id": "jaguar-01",
-    "title": "Rugido nocturno",
-    "species": "Jaguar",
-    "tags": ["mamiferos"],
-    "audio": "media/audio/sample-jaguar.mp3",
-    "image": "media/images/sample-jaguar.jpg"
-  },
-  {
-    "id": "quetzal-01",
-    "title": "Canto del amanecer",
-    "species": "Quetzal",
+    "id": "kakui-01",
+    "title": "Canto del kakuy",
+    "species": "Kakuy",
     "tags": ["aves"],
-    "audio": "media/audio/sample-quetzal.mp3",
+    "audio": "media/audio/kakui.flac",
     "image": "media/images/sample-quetzal.jpg"
   },
   {
-    "id": "rana-01",
-    "title": "Coro de lluvia",
-    "species": "Rana de cristal",
-    "tags": ["anfibios"],
-    "audio": "media/audio/sample-rana.mp3",
+    "id": "alicuco-01",
+    "title": "Alicucu entre grillos",
+    "species": "Alicucu",
+    "tags": ["aves"],
+    "audio": "media/audio/alicuco-grillos.flac",
+    "image": "media/images/sample-jaguar.jpg"
+  },
+  {
+    "id": "grillos-01",
+    "title": "Coro intenso",
+    "species": "Grillos",
+    "tags": ["insectos"],
+    "audio": "media/audio/grillos-intenso.flac",
     "image": "media/images/sample-rana.jpg"
   },
   {
-    "id": "broken-01",
-    "title": "Grabacion perdida",
-    "species": "Desconocida",
-    "tags": ["mamiferos"],
-    "audio": "media/audio/does-not-exist.mp3",
-    "image": "media/images/sample-jaguar.jpg"
+    "id": "lluvia-01",
+    "title": "Lluvia sobre el galpón",
+    "species": "Paisaje sonoro",
+    "tags": ["ambiente"],
+    "audio": "media/audio/lluvia-galpon.flac",
+    "image": "media/images/sample-rana.jpg"
+  },
+  {
+    "id": "manana-01",
+    "title": "Mañana calurosa",
+    "species": "Paisaje sonoro",
+    "tags": ["ambiente"],
+    "audio": "media/audio/manana-calurosa.flac",
+    "image": "media/images/sample-quetzal.jpg"
   }
 ]

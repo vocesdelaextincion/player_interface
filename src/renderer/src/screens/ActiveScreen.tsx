@@ -45,7 +45,9 @@ export function ActiveScreen(): React.JSX.Element {
 
   return (
     <div className={styles.screen}>
-      <audio ref={audioElRef} src={current?.audioSrc} />
+      {/* preload="auto": the files are lossless and local, and the kiosk has nothing better to
+          do while idle — buffer the whole track so a tap on the hero starts it instantly. */}
+      <audio ref={audioElRef} src={current?.audioSrc} preload="auto" />
       <ActiveTagFilter tags={allTags} active={activeTag} onSelect={selectTag} />
 
       {current && (
