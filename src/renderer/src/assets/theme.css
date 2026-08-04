@@ -14,6 +14,15 @@
   --font-display: 'Fraunces Variable', Georgia, serif;
   --font-ui: 'Inter Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
+  /* Type scale. Display sizes are vh-clamped rather than fixed: the target kiosk's
+     resolution isn't confirmed, and a fixed 88px species name that looks right at 1080p
+     crowds the hero at 768p. Still not responsive design — no breakpoints, just fluid. */
+  --text-display: clamp(56px, 7.5vh, 88px);
+  --text-display-sub: clamp(24px, 3vh, 34px);
+  --text-staff: 40px;
+  --text-body: 18px;
+  --text-meta: 14px;
+
   /* Motion */
   --ease-cinematic: cubic-bezier(0.16, 1, 0.3, 1);
   --duration-ambient-crossfade: 2500ms;

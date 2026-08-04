@@ -61,10 +61,18 @@ one password gate — `AdminScreen` branches on `cameFromLocked`.
 Close/Restart are the first renderer actions needing the main process, so this stage added
 `app:quit` / `app:restart` IPC (`src/main/index.ts`) exposed as `window.api` via the preload.
 
-## Stage 7 — Styling pass ← next
-- [ ] Full `DESIGN.md` token set applied across every screen
-- [ ] Type scale applied (Fraunces display / Inter UI)
-- [ ] Touch-target audit (64px minimum everywhere)
+## Stage 7 — Styling pass ✅
+- [x] Full `DESIGN.md` token set applied across every screen
+- [x] Type scale applied (Fraunces display / Inter UI)
+- [x] Touch-target audit (64px minimum everywhere)
+
+Touch targets already passed — no element needed resizing. The real fixes were typographic: the
+Active hero was rendering `species — title` as one 64px line, which wraps badly once real Spanish
+species names land, so species and title are now two display elements. Type scale lives in
+`theme.css` as tokens; display sizes are `vh`-clamped against the unconfirmed target resolution.
+
+Still judged against placeholder color blocks — the overlay-gradient legibility call needs a second
+look once real photography lands.
 
 ## Stage 8 — Stability & packaging
 - [ ] Multi-hour soak test on the real (or comparable) machine, watch memory

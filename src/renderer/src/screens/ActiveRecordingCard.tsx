@@ -29,15 +29,14 @@ export function ActiveRecordingCard({
 
   return (
     <div className={styles.card} onClick={onTogglePlay}>
-      <img src={recording.imageSrc} alt="" className={styles.image} />
+      <img src={recording.imageSrc} alt="" className={styles.image} decoding="async" />
       <div className={styles.overlay} />
       <div className={styles.info}>
         <button className={styles.playButton} aria-label={isPlaying ? 'Pausar' : 'Reproducir'}>
           {isPlaying ? '❚❚' : '▶'}
         </button>
-        <h1 className={styles.title}>
-          {recording.species} — {recording.title}
-        </h1>
+        <h1 className={styles.species}>{recording.species}</h1>
+        <p className={styles.title}>{recording.title}</p>
         <p className={styles.tag}>{recording.tags.join(', ')}</p>
         <div
           className={styles.scrubTrack}
@@ -55,7 +54,9 @@ export function ActiveRecordingCard({
             <div className={styles.scrubFill} style={{ width: `${progress}%` }} />
           </div>
         </div>
-        <span className={styles.time}>{formatTime(currentTime)}</span>
+        <span className={styles.time}>
+          {formatTime(currentTime)} / {formatTime(durationSec)}
+        </span>
       </div>
     </div>
   )

@@ -14,15 +14,15 @@
 
 .title {
   font-family: var(--font-display);
-  font-size: 40px;
+  font-size: var(--text-staff);
   font-weight: 600;
   color: var(--color-text-muted);
 }
 
 .hint {
   font-family: var(--font-ui);
-  font-size: 14px;
+  font-size: var(--text-meta);
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: var(--color-accent-dim);
+  color: var(--color-text-muted);
 }

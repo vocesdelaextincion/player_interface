@@ -21,6 +21,16 @@ Photos are shown full color, as shot — no color grading. Color consistency acr
 
 - **Display (species name, recording title):** serif — [Fraunces](https://fonts.google.com/specimen/Fraunces). Warm, editorial, documentary-title character. 64-96px at fullscreen scale.
 - **UI / body / tags:** sans — [Inter](https://fonts.google.com/specimen/Inter). Neutral, clean, high legibility for metadata and controls.
+
+| Token | Size | Use |
+|---|---|---|
+| `--text-display` | `clamp(56px, 7.5vh, 88px)` | Species name — the Active hero |
+| `--text-display-sub` | `clamp(24px, 3vh, 34px)` | Recording title, italic, beneath the species |
+| `--text-staff` | `40px` | Admin / Locked headings (toned down on purpose) |
+| `--text-body` | `18px` | Admin action buttons |
+| `--text-meta` | `14px` | Tags, timecodes, hints — uppercase + letter-spaced where it's a label |
+
+The two display sizes are `vh`-clamped rather than fixed. The target kiosk's resolution isn't confirmed, and a fixed 88px species name that reads well at 1080p crowds the hero at 768p. This isn't responsive design — no breakpoints, no reflow, just fluid type against an unknown screen.
 - Both fonts **bundled in the repo** (`@font-face`, local files) — the kiosk has no internet; a Google Fonts link would silently fall back to system serif.
 - Tags/category labels: small, uppercase, letter-spaced (documentary lower-third style).
 
@@ -46,3 +56,5 @@ Hard rule for the old kiosk machine: animate `transform` and `opacity` only, one
 ## Touch targets
 
 Minimum 64px hit area (larger than typical web 44px minimum) — public kiosk, no precision or familiarity assumed from visitors.
+
+Audited at Stage 7 — every interactive element carries `min-height: var(--touch-target-min)`: tag chips, scrub track, admin buttons, password field (64px), play button (72px), carousel arrows (88px). The carousel dots are deliberately *not* interactive; they're a position indicator, so their 8px size is fine.

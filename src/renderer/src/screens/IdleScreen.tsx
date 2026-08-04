@@ -36,6 +36,7 @@ export function IdleScreen({ onActivate }: { onActivate: () => void }): React.JS
             src={images[index]}
             alt=""
             className={styles.image}
+            decoding="async"
             initial={{ opacity: 0 }}
             animate={{
               opacity: 1,

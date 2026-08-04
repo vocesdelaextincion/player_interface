@@ -49,16 +49,28 @@
   cursor: pointer;
 }
 
+/* Species leads, title supports — DESIGN.md treats them as two display elements, and a
+   single combined line wraps badly once real Spanish species names land. */
+.species {
+  font-family: var(--font-display);
+  font-size: var(--text-display);
+  font-weight: 600;
+  line-height: 1.05;
+  color: var(--color-text);
+}
+
 .title {
   font-family: var(--font-display);
-  font-size: 64px;
-  font-weight: 600;
+  font-size: var(--text-display-sub);
+  font-weight: 400;
+  font-style: italic;
+  line-height: 1.2;
   color: var(--color-text);
 }
 
 .tag {
   font-family: var(--font-ui);
-  font-size: 14px;
+  font-size: var(--text-meta);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--color-text-muted);
@@ -88,6 +100,7 @@
 
 .time {
   font-family: var(--font-ui);
-  font-size: 14px;
+  font-size: var(--text-meta);
+  font-variant-numeric: tabular-nums;
   color: var(--color-text-muted);
 }
