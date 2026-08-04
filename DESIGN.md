@@ -68,16 +68,16 @@ Slow and cinematic for anything ambient or state-level; a touch snappier only fo
 
 | Token | Duration | Easing | Use |
 |---|---|---|---|
-| `motion-ambient` | 2-3s crossfade, ~20-30s hold | linear/ease | Idle background image cycling |
+| `motion-ambient` | 0.6s fade through black | linear | Idle video clip changes |
 | `motion-state` | 900-1200ms | `cubic-bezier(0.16, 1, 0.3, 1)` | Idle ↔ Active, Admin/Locked transitions |
 | `motion-carousel` | 500-700ms | `cubic-bezier(0.16, 1, 0.3, 1)` | Moving between recordings |
 | `motion-feedback` | 150-250ms | standard ease | Play/pause toggle, button press |
 
-Hard rule for the old kiosk machine: animate `transform` and `opacity` only, one full-bleed animated layer at a time. If Ken Burns stutters on the target hardware, drop the pan/zoom and keep only the crossfade — the crossfade is the mood-critical part.
+Hard rule for the old kiosk machine: animate `transform` and `opacity` only, one full-bleed animated layer at a time. Idle honours this by fading a single video element out to black before swapping its source, rather than cross-fading two clips — two simultaneous 1080p decodes is the one thing most likely to sink the target hardware. If idle still stutters, raise `idleVideoPlaybackRate` toward 1 before touching anything else.
 
 ## Layout — per state
 
-- **Idle:** full-bleed species photo(s), slow Ken Burns pan/zoom, slow crossfade between images. No visible UI chrome.
+- **Idle:** full-bleed video, played slowed and silent, `object-fit: cover`. Random clip order, a short fade through black between them. No text, no chrome, no audio — the footage carries the whole screen.
 - **Active:** full-bleed carousel, one recording centered at a time. Tapping the hero image plays it in place — play/pause overlay + scrub bar directly on the photo, title + tag beneath. Large arrow buttons (left/right edges) to move between recordings — tap only, no swipe/gesture input anywhere; the touchscreen may not support gestures reliably. Tag-filter chips in a row along the top edge; active chip in `accent`.
 - **Admin / Locked:** same theme (dark bg, same type/accent), toned down — no ambient animation, flat and static, so it clearly reads as a distinct, staff-only mode.
 

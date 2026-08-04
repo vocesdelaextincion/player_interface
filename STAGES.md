@@ -85,10 +85,13 @@ Motion, and all of them move only `opacity`, `scale`, `x`, `y`. The one violatio
 bar's progress fill, which drove `width` ~4x/sec for the length of every track; it's now `scaleX`.
 Listener/timer cleanup is balanced (10 registrations, 10 teardowns).
 
-Caveat on "one full-bleed animated layer": a crossfade and a slide both need two layers by
-definition, so Idle composites two for 2.5s of every 27.5s cycle, and the carousel for 600ms per
-move. Both are transform/opacity, so they stay on the compositor. `kenBurnsEnabled = false` collapses
-the Idle case to opacity-only if the real hardware struggles.
+Caveat on "one full-bleed animated layer": the carousel slide needs two layers by definition, for
+600ms per move. Both are transform/opacity, so they stay on the compositor.
+
+Superseded for Idle: the image crossfade described here was replaced by slowed video, which never
+composites two layers — it fades a single element to black before swapping source, precisely to
+avoid two simultaneous decodes. Video decode is now the heaviest thing the app does and the most
+likely thing to strain the kiosk; `idleVideoPlaybackRate` is the first dial to turn.
 
 Packaging: the deliverable is `bun run build:win:zip`, unpacked and run directly on the kiosk.
 `framer-motion` moved to `devDependencies` (the renderer bundle already inlines it, and main and

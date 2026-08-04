@@ -38,8 +38,9 @@ a real keyboard, or hours of wall-clock time — none of it can be verified from
 
 - [ ] Leave it on Idle for 4+ hours. Memory in Task Manager should be flat, not climbing.
 - [ ] Leave it on Active with a track looping for 1+ hour. Same.
-- [ ] Watch a few Idle crossfades late in that run — if the pan/zoom stutters, set
-      `kenBurnsEnabled = false` in `src/renderer/src/theme.ts` and rebuild. The crossfade is the
-      mood-critical part; the pan is not.
+- [ ] Watch idle footage late in that run. Video decode is the heaviest thing this app does, so
+      this is where an old machine will show strain first. If it stutters, raise
+      `idleVideoPlaybackRate` in `src/renderer/src/theme.ts` (closer to 1 = fewer frames held
+      = less work) or re-encode the clips smaller than 1080p.
 - [ ] Cycle Idle → Active → Admin → Locked → Idle a dozen times and re-check memory. This is the
       path most likely to leak, since every screen mounts and unmounts listeners and timers.

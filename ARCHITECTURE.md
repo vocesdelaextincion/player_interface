@@ -2,7 +2,7 @@
 
 ## States
 
-- **Idle** — ambient animation, default resting screen. Any touch → Active.
+- **Idle** — silent, slowed video, default resting screen. A random clip plays at reduced speed, fades through black, and another random clip follows, indefinitely. No text, no chrome, no audio. Any touch → Active.
 - **Active** — full-bleed carousel, one recording centered at a time, tag-filter chip row above. Tap the hero image to play/pause in place. No touch for 45s **and** no audio playing → back to Idle (a playing track defers the timer until it ends).
 - **Admin** — password-gated, opened by F4 from any state. Opening the prompt stops playback. Wrong password: shake feedback, stay on prompt. Esc cancels back to previous state. Actions: Close app, Restart app, Lock.
 - **Locked** — freezes all touch input (screen-cleaning mode); only F4 is listened for. Unlocked the same way it was entered (F4 + password) → returns to Idle.
@@ -29,11 +29,19 @@ No backend, no internet. Audio and images are bundled in the repo.
 
 ```
 media/
-  audio/       *.flac (*.mp3 also accepted)
-  images/      *.jpg
+  audio/            *.flac (*.mp3 also accepted)
+  images/           *.jpg
+  videos/           *.mp4   — idle footage, 1080p, no audio track
+  videos/masters/   *.mp4   — 4K originals, deliberately outside the glob
 content/
   recordings.json
 ```
+
+Idle footage is bundled by a separate glob and is **not** part of `recordings.json` — clips aren't
+tied to recordings, they're picked at random. Source material comes off the camera at 4K and ~85
+Mbps, which a kiosk-grade machine cannot decode; deliverables are re-encoded to 1080p with the audio
+stream stripped. The masters live in `videos/masters/`, one level below the non-recursive glob, so
+they stay in the repo without reaching the build.
 
 Audio is lossless FLAC — the kiosk plays from local disk with no bandwidth constraint, so there's
 no reason to throw quality away. The loader's glob is **extension-scoped** (`*.{flac,mp3}`): an

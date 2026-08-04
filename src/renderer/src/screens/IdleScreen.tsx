@@ -1,58 +1,89 @@
-import { useEffect, useState } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { motion } from 'framer-motion'
 import styles from './IdleScreen.module.css'
-import { recordings } from '../content/recordings'
-import { duration, easeCinematic, kenBurnsEnabled } from '../theme'
+import { duration, idleVideoPlaybackRate } from '../theme'
 
-// A few pan/zoom directions so consecutive images don't all drift the same way.
-const KEN_BURNS_VARIANTS = [
-  { scale: 1.08, x: '-1%', y: '1%' },
-  { scale: 1.06, x: '1%', y: '-1%' },
-  { scale: 1.1, x: 0, y: 0 }
-]
+// Eager, like the recordings loader: the set is tiny and this runs once at startup.
+// Extension-scoped so the 4K masters in media/videos/masters/ are never bundled.
+const videos = Object.values(
+  import.meta.glob('../../../../media/videos/*.mp4', {
+    eager: true,
+    query: '?url',
+    import: 'default'
+  })
+) as string[]
 
-const cycleSeconds = duration.ambientHold + duration.ambientCrossfade
+function pickDifferent(current: number, total: number): number {
+  if (total <= 1) return current
+  let next = current
+  while (next === current) next = Math.floor(Math.random() * total)
+  return next
+}
 
+// Idle is video only — no text, no chrome, no audio (see ARCHITECTURE.md). The clips are a few
+// seconds each, so idle cycles through them at random for as long as nobody touches the screen.
 export function IdleScreen({ onActivate }: { onActivate: () => void }): React.JSX.Element {
-  const images = recordings.map((recording) => recording.imageSrc)
-  const [index, setIndex] = useState(0)
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const [index, setIndex] = useState(() => Math.floor(Math.random() * Math.max(1, videos.length)))
+  const [visible, setVisible] = useState(true)
 
+  // playbackRate is reset by the element every time a new source loads, so it has to be
+  // reapplied per clip rather than set once.
   useEffect(() => {
-    if (images.length <= 1) return
-    const id = setInterval(() => {
-      setIndex((current) => (current + 1) % images.length)
-    }, cycleSeconds * 1000)
-    return () => clearInterval(id)
-  }, [images.length])
+    const el = videoRef.current
+    if (!el) return
 
-  const kenBurns = KEN_BURNS_VARIANTS[index % KEN_BURNS_VARIANTS.length]
+    function applyRate(): void {
+      const video = videoRef.current
+      if (!video) return
+      video.playbackRate = idleVideoPlaybackRate
+      // autoPlay covers the first clip; this covers every source swap after it.
+      void video.play().catch(() => {})
+    }
+
+    applyRate()
+    el.addEventListener('loadeddata', applyRate)
+    return () => el.removeEventListener('loadeddata', applyRate)
+  }, [index])
+
+  const handleEnded = useCallback(() => {
+    // A single clip can't cross-fade to anything else — just loop it in place.
+    if (videos.length <= 1) {
+      const el = videoRef.current
+      if (el) {
+        el.currentTime = 0
+        void el.play().catch(() => {})
+      }
+      return
+    }
+    setVisible(false)
+  }, [])
+
+  // Swap the source only once the fade-out has finished, so one video element is ever decoding
+  // (ARCHITECTURE.md: one full-bleed animated layer at a time).
+  const handleFadeComplete = useCallback(() => {
+    if (visible) return
+    setIndex((current) => pickDifferent(current, videos.length))
+    setVisible(true)
+  }, [visible])
 
   return (
     <div className={styles.screen} onPointerDown={onActivate}>
-      {images.length > 0 && (
-        <AnimatePresence>
-          <motion.img
-            key={index}
-            src={images[index]}
-            alt=""
-            className={styles.image}
-            decoding="async"
-            initial={{ opacity: 0 }}
-            animate={{
-              opacity: 1,
-              scale: kenBurnsEnabled ? kenBurns.scale : 1,
-              x: kenBurnsEnabled ? kenBurns.x : 0,
-              y: kenBurnsEnabled ? kenBurns.y : 0
-            }}
-            exit={{ opacity: 0 }}
-            transition={{
-              opacity: { duration: duration.ambientCrossfade, ease: easeCinematic },
-              scale: { duration: cycleSeconds, ease: 'linear' },
-              x: { duration: cycleSeconds, ease: 'linear' },
-              y: { duration: cycleSeconds, ease: 'linear' }
-            }}
-          />
-        </AnimatePresence>
+      {videos.length > 0 && (
+        <motion.video
+          ref={videoRef}
+          className={styles.video}
+          src={videos[index]}
+          autoPlay
+          muted
+          playsInline
+          preload="auto"
+          onEnded={handleEnded}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: visible ? 1 : 0 }}
+          transition={{ duration: duration.idleVideoFade, ease: 'linear' }}
+          onAnimationComplete={handleFadeComplete}
+        />
       )}
     </div>
   )

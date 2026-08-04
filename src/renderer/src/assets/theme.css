@@ -41,7 +41,7 @@
 
   /* Motion */
   --ease-cinematic: cubic-bezier(0.16, 1, 0.3, 1);
-  --duration-ambient-crossfade: 2500ms;
+  --duration-idle-video-fade: 600ms;
   --duration-state: 1000ms;
   --duration-carousel: 600ms;
   --duration-feedback: 200ms;
