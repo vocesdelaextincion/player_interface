@@ -1,14 +1,30 @@
 /* Design tokens — see DESIGN.md. Keep this file and DESIGN.md in sync. */
 
 :root {
-  /* Color */
-  --color-bg: #0d110f;
-  --color-text: #f2f1ec;
-  --color-text-muted: #a8aca6;
-  --color-accent: #4f9d6e;
-  --color-accent-hover: #79c39a;
-  --color-accent-dim: #2e4a3b;
-  --overlay-gradient: linear-gradient(to top, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0));
+  /* Color — three source colors, nothing else. Black, green, white.
+     Everything below is one of these three at reduced alpha, so there is no fourth
+     hue that can drift out of sync: change a triplet here and the whole app follows.
+     (Channel triplets rather than hex because Chromium 108 has no color-mix().) */
+  --rgb-black: 7 12 9;
+  --rgb-green: 79 157 110;
+  --rgb-white: 241 245 241;
+
+  --color-bg: rgb(var(--rgb-black));
+  --color-accent: rgb(var(--rgb-green));
+  --color-text: rgb(var(--rgb-white));
+
+  --color-text-muted: rgb(var(--rgb-white) / 0.56);
+  /* 0.45, not lower: this is the unfilled scrub track, and it has to read as something
+     you can touch. Below ~0.4 it disappears into the background. */
+  --color-accent-dim: rgb(var(--rgb-green) / 0.45);
+  /* Dark disc behind the carousel arrows. 0.65 keeps the white glyph at 5.7:1 even over a
+     blown-out white photo — the worst case in an unknown catalog. */
+  --color-scrim: rgb(var(--rgb-black) / 0.65);
+  --overlay-gradient: linear-gradient(
+    to top,
+    rgb(var(--rgb-black) / 0.88),
+    rgb(var(--rgb-black) / 0)
+  );
 
   /* Type */
   --font-display: 'Fraunces Variable', Georgia, serif;

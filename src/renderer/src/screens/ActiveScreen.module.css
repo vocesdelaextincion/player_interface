@@ -28,7 +28,7 @@
   min-height: var(--touch-target-min);
   border: none;
   border-radius: 50%;
-  background: rgba(13, 17, 15, 0.5);
+  background: var(--color-scrim);
   color: var(--color-text);
   font-size: 40px;
   line-height: 1;

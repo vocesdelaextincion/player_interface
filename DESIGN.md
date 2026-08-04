@@ -5,15 +5,36 @@ Cinematic and moody — dark, nature-documentary feel. Imagery and motion carry 
 
 ## Color
 
-| Token | Value | Use |
+Three colors. Black, green, white — nothing else.
+
+| Source | Value | Character |
 |---|---|---|
-| `bg` | `#0D110F` | Base background (warm-black, slight green tint) |
-| `text` | `#F2F1EC` | Primary text (warm off-white, not pure white) |
-| `text-muted` | `#A8ACA6` | Secondary text, metadata, tags |
-| `accent` | `#4F9D6E` | Interactive elements: active states, controls, progress |
-| `accent-hover` | `#79C39A` | Hover/active-press feedback |
-| `accent-dim` | `#2E4A3B` | Disabled/inactive accent variant |
-| `overlay` | `rgba(0,0,0,0.85)` → `rgba(0,0,0,0)` | Gradient over photos, bottom-up, for text legibility |
+| `--rgb-black` | `7 12 9` → `#070C09` | Near-black at 0.33% luminance. Green is the dominant channel, so it reads as black with a green undertone rather than a neutral or blue-black. |
+| `--rgb-green` | `79 157 110` → `#4F9D6E` | The only accent. Muted forest green, not a UI green. |
+| `--rgb-white` | `241 245 241` → `#F1F5F1` | Off-white carrying the same faint green cast, so the palette has one temperature. |
+
+Every other colour in the app is one of those three at reduced alpha — there is no fourth hue:
+
+| Token | Derivation | Use |
+|---|---|---|
+| `--color-bg` | black | Base background |
+| `--color-text` | white | Primary text |
+| `--color-accent` | green | Interactive: active chip, play button, progress fill |
+| `--color-text-muted` | white @ 56% | Metadata, tags, hints |
+| `--color-accent-dim` | green @ 45% | Unfilled scrub track, password-card border |
+| `--color-scrim` | black @ 65% | Disc behind the carousel arrows |
+| `--overlay-gradient` | black 88% → 0% | Bottom-up gradient over photos, for text legibility |
+
+They're stored as channel triplets rather than hex so the alpha variants derive from the source
+values instead of restating them. Chromium 108 (Electron 22, see `README.md`) has no `color-mix()`,
+so `rgb(var(--rgb-white) / 0.56)` is the mechanism. **Change a triplet and the whole app follows.**
+
+Measured contrast on the background: white text **17.9:1** (AAA), muted text **5.9:1** (AA), green
+**6.0:1** (AA). One rule falls out of this and must hold: **text on the green is always black, never
+white** — white on green is only 3.0:1 and fails. Every current use already does this.
+
+There is no hover token. The kiosk is touch-only with the cursor hidden, so press feedback is
+`:active`, and a hover state would be dead weight.
 
 Photos are shown full color, as shot — no color grading. Color consistency across the catalog comes from the surrounding UI, not the images.
 
