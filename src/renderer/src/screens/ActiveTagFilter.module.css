@@ -27,6 +27,6 @@
 
 .chipActive {
   border-color: var(--color-accent);
-  color: var(--color-bg);
+  color: var(--color-text);
   background: var(--color-accent);
 }

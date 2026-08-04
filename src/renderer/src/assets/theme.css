@@ -5,8 +5,8 @@
      Everything below is one of these three at reduced alpha, so there is no fourth
      hue that can drift out of sync: change a triplet here and the whole app follows.
      (Channel triplets rather than hex because Chromium 108 has no color-mix().) */
-  --rgb-black: 7 12 9;
-  --rgb-green: 79 157 110;
+  --rgb-black: 6 17 10;
+  --rgb-green: 58 125 86;
   --rgb-white: 241 245 241;
 
   --color-bg: rgb(var(--rgb-black));
@@ -14,9 +14,9 @@
   --color-text: rgb(var(--rgb-white));
 
   --color-text-muted: rgb(var(--rgb-white) / 0.56);
-  /* 0.45, not lower: this is the unfilled scrub track, and it has to read as something
-     you can touch. Below ~0.4 it disappears into the background. */
-  --color-accent-dim: rgb(var(--rgb-green) / 0.45);
+  /* 0.6: this is the unfilled scrub track and has to read as something you can touch.
+     The deeper green needs more alpha than the old one to stay visible on black. */
+  --color-accent-dim: rgb(var(--rgb-green) / 0.6);
   /* Dark disc behind the carousel arrows. 0.65 keeps the white glyph at 5.7:1 even over a
      blown-out white photo — the worst case in an unknown catalog. */
   --color-scrim: rgb(var(--rgb-black) / 0.65);
