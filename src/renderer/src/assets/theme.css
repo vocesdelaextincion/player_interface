@@ -20,6 +20,9 @@
   /* Dark disc behind the carousel arrows. 0.65 keeps the white glyph at 5.7:1 even over a
      blown-out white photo — the worst case in an unknown catalog. */
   --color-scrim: rgb(var(--rgb-black) / 0.65);
+  /* Flat dim over idle footage — enough to push it back behind the instruction text without
+     draining the image. */
+  --color-idle-veil: rgb(var(--rgb-black) / 0.35);
   --overlay-gradient: linear-gradient(
     to top,
     rgb(var(--rgb-black) / 0.88),
@@ -41,7 +44,7 @@
 
   /* Motion */
   --ease-cinematic: cubic-bezier(0.16, 1, 0.3, 1);
-  --duration-idle-video-fade: 600ms;
+  --duration-idle-video-fade: 1200ms;
   --duration-state: 1000ms;
   --duration-carousel: 600ms;
   --duration-feedback: 200ms;

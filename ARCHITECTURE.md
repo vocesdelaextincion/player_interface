@@ -2,7 +2,7 @@
 
 ## States
 
-- **Idle** — silent, slowed video, default resting screen. A random clip plays at reduced speed, fades through black, and another random clip follows, indefinitely. No text, no chrome, no audio. Any touch → Active.
+- **Idle** — silent, slowed video, default resting screen. A random clip plays at reduced speed, fades through black, and another random clip follows, indefinitely. Footage sits behind a dimming veil with one line of instruction ("Toca la pantalla para comenzar") bottom-centred. No audio. Any touch → Active.
 - **Active** — full-bleed carousel, one recording centered at a time, tag-filter chip row above. Tap the hero image to play/pause in place. No touch for 45s **and** no audio playing → back to Idle (a playing track defers the timer until it ends).
 - **Admin** — password-gated, opened by F4 from any state. Opening the prompt stops playback. Wrong password: shake feedback, stay on prompt. Esc cancels back to previous state. Actions: Close app, Restart app, Lock.
 - **Locked** — freezes all touch input (screen-cleaning mode); only F4 is listened for. Unlocked the same way it was entered (F4 + password) → returns to Idle.
@@ -25,7 +25,7 @@ Locked  --F4+password-->  Idle
 
 ## Content
 
-No backend, no internet. Audio and images are bundled in the repo.
+No backend, no internet. Audio, images, and video are bundled in the repo.
 
 ```
 media/
@@ -93,7 +93,7 @@ Entries with a missing or unloadable audio/image file are skipped at load (conso
 ## Long-run stability (old machine, runs all day)
 
 - Animate `transform`/`opacity` only; never layout properties.
-- At most one full-bleed animated layer at a time (Idle Ken Burns).
+- At most one full-bleed animated layer at a time. Idle's clip changes fade a single video element out and back rather than cross-fading two, so there is never more than one decode in flight — the heaviest constraint on this machine.
 - Images pre-scaled to screen resolution at build time — no multi-MB originals decoded live.
 - Reuse a single `<audio>` element; clear timers/listeners on every state exit; no unbounded state growth.
 

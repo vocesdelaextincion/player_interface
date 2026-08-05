@@ -4,7 +4,7 @@
 export const easeCinematic = [0.16, 1, 0.3, 1] as const
 
 export const duration = {
-  idleVideoFade: 0.6, // fade through black between idle clips
+  idleVideoFade: 1.2, // fade through black between idle clips (each way)
   state: 1,
   carousel: 0.6,
   feedback: 0.2

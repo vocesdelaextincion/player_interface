@@ -20,34 +20,37 @@ function pickDifferent(current: number, total: number): number {
   return next
 }
 
-// Idle is video only — no text, no chrome, no audio (see ARCHITECTURE.md). The clips are a few
-// seconds each, so idle cycles through them at random for as long as nobody touches the screen.
+// Idle plays slowed, silent footage behind a dimming veil and a single line of instruction
+// (see ARCHITECTURE.md). Clips are picked at random and cycle for as long as nobody touches.
 export function IdleScreen({ onActivate }: { onActivate: () => void }): React.JSX.Element {
   const videoRef = useRef<HTMLVideoElement>(null)
   const [index, setIndex] = useState(() => Math.floor(Math.random() * Math.max(1, videos.length)))
   const [visible, setVisible] = useState(true)
 
-  // playbackRate is reset by the element every time a new source loads, so it has to be
-  // reapplied per clip rather than set once.
+  // Two jobs, both of which must happen per clip rather than once:
+  // playbackRate is reset by the element on every source load, and the fade-in has to wait for
+  // the first frame to actually exist — fading in on a still-loading element shows a fade to
+  // black followed by a pop when the frame arrives, which is what makes a swap look abrupt.
   useEffect(() => {
     const el = videoRef.current
     if (!el) return
 
-    function applyRate(): void {
+    function handleLoadedData(): void {
       const video = videoRef.current
       if (!video) return
       video.playbackRate = idleVideoPlaybackRate
       // autoPlay covers the first clip; this covers every source swap after it.
       void video.play().catch(() => {})
+      setVisible(true)
     }
 
-    applyRate()
-    el.addEventListener('loadeddata', applyRate)
-    return () => el.removeEventListener('loadeddata', applyRate)
+    if (el.readyState >= 2) handleLoadedData()
+    el.addEventListener('loadeddata', handleLoadedData)
+    return () => el.removeEventListener('loadeddata', handleLoadedData)
   }, [index])
 
   const handleEnded = useCallback(() => {
-    // A single clip can't cross-fade to anything else — just loop it in place.
+    // A single clip has nothing to cut to — loop it in place instead of fading to itself.
     if (videos.length <= 1) {
       const el = videoRef.current
       if (el) {
@@ -59,12 +62,12 @@ export function IdleScreen({ onActivate }: { onActivate: () => void }): React.JS
     setVisible(false)
   }, [])
 
-  // Swap the source only once the fade-out has finished, so one video element is ever decoding
-  // (ARCHITECTURE.md: one full-bleed animated layer at a time).
+  // Swap the source only once the fade-out has finished, so exactly one clip is ever decoding
+  // (ARCHITECTURE.md: one full-bleed animated layer at a time). `visible` stays false here —
+  // the effect above raises it when the new clip's first frame is ready.
   const handleFadeComplete = useCallback(() => {
     if (visible) return
     setIndex((current) => pickDifferent(current, videos.length))
-    setVisible(true)
   }, [visible])
 
   return (
@@ -81,10 +84,12 @@ export function IdleScreen({ onActivate }: { onActivate: () => void }): React.JS
           onEnded={handleEnded}
           initial={{ opacity: 0 }}
           animate={{ opacity: visible ? 1 : 0 }}
-          transition={{ duration: duration.idleVideoFade, ease: 'linear' }}
+          transition={{ duration: duration.idleVideoFade, ease: 'easeInOut' }}
           onAnimationComplete={handleFadeComplete}
         />
       )}
+      <div className={styles.veil} />
+      <p className={styles.hint}>Toca la pantalla para comenzar</p>
     </div>
   )
 }

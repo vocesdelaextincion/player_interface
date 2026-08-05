@@ -13,3 +13,28 @@
   height: 100%;
   object-fit: cover;
 }
+
+/* Static, never animated — knocks the footage back so it reads as a backdrop rather than
+   playback, and gives the instruction a consistent base to sit on whatever the frame shows. */
+.veil {
+  position: absolute;
+  inset: 0;
+  /* Flat dim for the whole frame, plus the standard bottom-up gradient so the instruction stays
+     legible no matter how bright the footage gets under it (DESIGN.md "Color"). */
+  background: var(--overlay-gradient), var(--color-idle-veil);
+  pointer-events: none;
+}
+
+.hint {
+  position: absolute;
+  bottom: 7vh;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  text-align: center;
+  font-family: var(--font-ui);
+  font-size: var(--text-body);
+  letter-spacing: 0.14em;
+  color: var(--color-text);
+  pointer-events: none;
+}
