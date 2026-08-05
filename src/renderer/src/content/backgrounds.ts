@@ -39,3 +39,8 @@ function loadBackgrounds(): MenuBackground[] {
 }
 
 export const menuBackgrounds = loadBackgrounds()
+
+// Staff-only screens share one background, separate from the visitor carousel.
+export const adminBackground: string | undefined = Object.entries(files).find(
+  ([path]) => (path.split('/').pop() ?? '').toLowerCase() === 'admin_menu.jpg'
+)?.[1]

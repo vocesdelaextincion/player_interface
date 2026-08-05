@@ -1,0 +1,73 @@
+.screen {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--color-bg);
+}
+
+.background {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Deliberately heavier than any visitor screen. Staff mode should not look like the exhibit —
+   the photograph is present but pushed right back (DESIGN.md "Layout — per state"). */
+.veil {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      to right,
+      rgb(var(--rgb-black) / 0.94),
+      rgb(var(--rgb-black) / 0.78) 40%,
+      rgb(var(--rgb-black) / 0.55) 100%
+    ),
+    rgb(var(--rgb-black) / 0.35);
+}
+
+/* The thing that says "this is not the exhibit". Top-left, always present on both staff
+   screens, accent-outlined so it reads as a mode marker rather than a heading. */
+.badge {
+  position: absolute;
+  top: 4vh;
+  left: 6vw;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 22px;
+  border: 1px solid var(--color-accent);
+  border-radius: 999px;
+  background: var(--color-row);
+  font-family: var(--font-ui);
+  font-size: var(--text-meta);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--color-text);
+}
+
+.badgeDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-accent);
+}
+
+.content {
+  position: absolute;
+  top: 50%;
+  left: 6vw;
+  transform: translateY(-50%);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 28px;
+  width: 44vw;
+  text-align: left;
+}

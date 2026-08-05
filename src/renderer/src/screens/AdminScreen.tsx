@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import styles from './AdminScreen.module.css'
+import { AdminFrame } from './AdminFrame'
 import { PasswordPrompt } from './PasswordPrompt'
 
 interface AdminScreenProps {
@@ -25,8 +26,8 @@ export function AdminScreen({
   if (!authenticated) return <PasswordPrompt onSuccess={handleSuccess} />
 
   return (
-    <div className={styles.screen}>
-      <h1 className={styles.title}>Modo administrador</h1>
+    <AdminFrame>
+      <h1 className={styles.title}>Acciones</h1>
       <div className={styles.actions}>
         <button className={styles.button} onClick={onLock}>
           Bloquear pantalla
@@ -39,6 +40,6 @@ export function AdminScreen({
         </button>
       </div>
       <p className={styles.hint}>Esc para volver</p>
-    </div>
+    </AdminFrame>
   )
 }
