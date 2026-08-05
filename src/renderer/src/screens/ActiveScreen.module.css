@@ -117,20 +117,25 @@
   min-width: 0;
 }
 
-/* Grouped at the top edge rather than the side margins — the menu owns one whole side of the
-   screen, so anything vertically centred fights it. */
+/* Along the top edge rather than the side margins — the menu owns one whole side of the screen,
+   so anything vertically centred fights it. Pushed to opposite corners, inset to the same 6vw as
+   the menu column so they line up with it. The strip itself ignores pointer events; only the
+   buttons take them, so the empty span between them stays inert. */
 .pager {
   position: absolute;
   top: 3vh;
-  left: 50%;
-  transform: translateX(-50%);
+  left: 0;
+  right: 0;
   z-index: 3;
   display: flex;
   align-items: center;
-  gap: 16px;
+  justify-content: space-between;
+  padding: 0 6vw;
+  pointer-events: none;
 }
 
 .arrow {
+  pointer-events: auto;
   width: 72px;
   height: 72px;
   min-width: var(--touch-target-min);
