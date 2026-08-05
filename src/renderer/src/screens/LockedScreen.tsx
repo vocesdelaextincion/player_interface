@@ -1,17 +1,13 @@
 import styles from './LockedScreen.module.css'
+import { StaffFrame } from './StaffFrame'
 
-// Screen-cleaning mode. Nothing here is interactive, and `touch-action: none` plus the
-// swallowed pointer events keep wiping the glass from triggering native touch behaviour
-// (drag, long-press). Only the shell's window-level F4 listener stays live.
+// Screen-cleaning mode. `blockTouch` swallows every touch on the frame; the only way out is the
+// shell's window-level F4 listener.
 export function LockedScreen(): React.JSX.Element {
   return (
-    <div
-      className={styles.screen}
-      onPointerDown={(event) => event.preventDefault()}
-      onContextMenu={(event) => event.preventDefault()}
-    >
+    <StaffFrame badge="Modo bloqueo" blockTouch>
       <h1 className={styles.title}>Pantalla bloqueada</h1>
       <p className={styles.hint}>F4 para desbloquear</p>
-    </div>
+    </StaffFrame>
   )
 }

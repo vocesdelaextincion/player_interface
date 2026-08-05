@@ -6,6 +6,13 @@
   background: var(--color-bg);
 }
 
+/* Locked: nothing here is interactive, and touch-action plus the swallowed pointer events keep
+   wiping the glass from triggering native drag or long-press. */
+.screenLocked {
+  composes: screen;
+  touch-action: none;
+}
+
 .background {
   position: absolute;
   inset: 0;

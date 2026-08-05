@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion, useAnimationControls } from 'framer-motion'
 import styles from './PasswordPrompt.module.css'
-import { AdminFrame } from './AdminFrame'
+import { StaffFrame } from './StaffFrame'
 import { ADMIN_PASSWORD } from '../admin'
 
 export function PasswordPrompt({ onSuccess }: { onSuccess: () => void }): React.JSX.Element {
@@ -27,7 +27,7 @@ export function PasswordPrompt({ onSuccess }: { onSuccess: () => void }): React.
   }
 
   return (
-    <AdminFrame>
+    <StaffFrame badge="Panel de administración">
       <motion.form className={styles.form} animate={shake} onSubmit={handleSubmit}>
         <h1 className={styles.title}>Contraseña</h1>
         <input
@@ -42,6 +42,6 @@ export function PasswordPrompt({ onSuccess }: { onSuccess: () => void }): React.
         />
         <p className={styles.hint}>Intro para confirmar · Esc para cancelar</p>
       </motion.form>
-    </AdminFrame>
+    </StaffFrame>
   )
 }
