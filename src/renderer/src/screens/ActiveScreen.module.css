@@ -19,7 +19,7 @@
   object-fit: cover;
 }
 
-/* The gradient runs from the menu side inward, so the titles sit on near-solid black while the
+/* The gradient runs from the menu side inward, so the rows sit on near-solid black while the
    far side of the photograph stays untouched. Same black as everything else, just at alpha. */
 .veilLeft,
 .veilRight {
@@ -46,7 +46,6 @@
   );
 }
 
-/* Inset from the edge far enough to clear the carousel arrows, which sit in the outer margin. */
 .menuLeft,
 .menuRight {
   position: absolute;
@@ -55,74 +54,92 @@
   z-index: 2;
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  width: 42vw;
+  gap: 10px;
+  width: 40vw;
 }
 
 .menuLeft {
-  left: 9vw;
-  align-items: flex-start;
-  text-align: left;
+  left: 6vw;
 }
 
 .menuRight {
-  right: 9vw;
-  align-items: flex-end;
-  text-align: right;
+  right: 6vw;
 }
 
+/* A panel, not bare text: on a photograph, the surface is what tells a visitor the row can be
+   pressed. Glyph leads on the left menu and trails on the right, mirroring the layout. */
 .item,
-.itemActive {
-  max-width: 100%;
+.itemPlaying {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
   min-height: var(--touch-target-min);
-  padding: 8px 0;
+  padding: 14px 26px;
   border: none;
-  background: transparent;
+  border-radius: 14px;
+  background: var(--color-row);
+  color: var(--color-text);
   font-family: var(--font-ui);
   font-size: var(--text-menu);
   font-weight: 400;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.03em;
   line-height: 1.25;
+  text-align: left;
   cursor: pointer;
 }
 
-.menuLeft .item,
-.menuLeft .itemActive {
-  text-align: left;
-}
-
 .menuRight .item,
-.menuRight .itemActive {
+.menuRight .itemPlaying {
+  flex-direction: row-reverse;
   text-align: right;
 }
 
-.item {
-  color: var(--color-text);
-}
-
 .item:active {
-  color: var(--color-accent);
+  background: var(--color-row-press);
 }
 
-.itemActive {
-  color: var(--color-accent);
+.itemPlaying {
+  background: var(--color-row-playing);
 }
 
-.arrowLeft,
-.arrowRight {
+.itemGlyph {
+  flex: none;
+  width: 1.1em;
+  font-size: 0.62em;
+  line-height: 1;
+  color: var(--color-text);
+  text-align: center;
+}
+
+.itemTitle {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Grouped at the top edge rather than the side margins — the menu owns one whole side of the
+   screen, so anything vertically centred fights it. */
+.pager {
   position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
+  top: 3vh;
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.arrow {
   width: 72px;
   height: 72px;
   min-width: var(--touch-target-min);
   min-height: var(--touch-target-min);
   border: none;
   border-radius: 50%;
-  background: transparent;
-  color: var(--color-text-muted);
-  font-size: 40px;
+  background: var(--color-row);
+  color: var(--color-text);
+  font-size: 34px;
   line-height: 1;
   display: flex;
   align-items: center;
@@ -130,21 +147,11 @@
   cursor: pointer;
 }
 
-.arrowLeft:active,
-.arrowRight:active {
-  color: var(--color-text);
+.arrow:active {
+  background: var(--color-row-press);
 }
 
-.arrowLeft:disabled,
-.arrowRight:disabled {
+.arrow:disabled {
   opacity: 0.25;
   cursor: default;
-}
-
-.arrowLeft {
-  left: 1.5vw;
-}
-
-.arrowRight {
-  right: 1.5vw;
 }

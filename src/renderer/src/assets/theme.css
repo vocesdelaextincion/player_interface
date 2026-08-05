@@ -23,6 +23,11 @@
   /* Flat dim over idle footage — enough to push it back behind the instruction text without
      draining the image. */
   --color-idle-veil: rgb(var(--rgb-black) / 0.35);
+  /* Recording menu rows. The panel is what makes them read as pressable over a photograph;
+     press lightens rather than darkens, so the feedback survives on a dark background. */
+  --color-row: rgb(var(--rgb-black) / 0.3);
+  --color-row-press: rgb(var(--rgb-white) / 0.16);
+  --color-row-playing: rgb(var(--rgb-green) / 0.38);
   --overlay-gradient: linear-gradient(
     to top,
     rgb(var(--rgb-black) / 0.88),

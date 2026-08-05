@@ -92,37 +92,45 @@ export function ActiveScreen(): React.JSX.Element {
           )}
 
           <nav className={background?.side === 'right' ? styles.menuRight : styles.menuLeft}>
-            {pages[page]?.map((recording, slot) => (
-              <button
-                // The same recording can appear on more than one page while the catalog is
-                // padded out, so the slot has to be part of the key.
-                key={`${page}-${slot}-${recording.id}`}
-                className={recording.id === selectedId ? styles.itemActive : styles.item}
-                onClick={() => handleSelect(recording)}
-              >
-                {recording.title}
-              </button>
-            ))}
+            {pages[page]?.map((recording, slot) => {
+              const isCurrent = recording.id === selectedId
+              return (
+                <button
+                  // The same recording can appear on more than one page while the catalog is
+                  // padded out, so the slot has to be part of the key.
+                  key={`${page}-${slot}-${recording.id}`}
+                  className={isCurrent ? styles.itemPlaying : styles.item}
+                  onClick={() => handleSelect(recording)}
+                >
+                  <span className={styles.itemGlyph} aria-hidden="true">
+                    {isCurrent && isPlaying ? '❚❚' : '▶'}
+                  </span>
+                  <span className={styles.itemTitle}>{recording.title}</span>
+                </button>
+              )
+            })}
           </nav>
         </motion.div>
       </AnimatePresence>
 
-      <button
-        className={styles.arrowLeft}
-        onClick={() => goTo(-1)}
-        disabled={pages.length <= 1}
-        aria-label="Anterior"
-      >
-        ‹
-      </button>
-      <button
-        className={styles.arrowRight}
-        onClick={() => goTo(1)}
-        disabled={pages.length <= 1}
-        aria-label="Siguiente"
-      >
-        ›
-      </button>
+      <div className={styles.pager}>
+        <button
+          className={styles.arrow}
+          onClick={() => goTo(-1)}
+          disabled={pages.length <= 1}
+          aria-label="Anterior"
+        >
+          ‹
+        </button>
+        <button
+          className={styles.arrow}
+          onClick={() => goTo(1)}
+          disabled={pages.length <= 1}
+          aria-label="Siguiente"
+        >
+          ›
+        </button>
+      </div>
 
       {selected && (
         <ActivePlayerBar
