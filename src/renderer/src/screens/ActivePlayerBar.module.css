@@ -1,0 +1,81 @@
+/* Fixed to the screen, not to the menu column: it has to survive page turns while a track keeps
+   playing, and it sits bottom-centre to echo the idle prompt's position. */
+.bar {
+  position: absolute;
+  bottom: 5vh;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  width: min(560px, 60vw);
+  padding: 12px 24px;
+  border-radius: 999px;
+  background: var(--color-scrim);
+}
+
+.toggle {
+  flex: none;
+  width: var(--touch-target-min);
+  height: var(--touch-target-min);
+  border: none;
+  border-radius: 50%;
+  background: var(--color-accent);
+  color: var(--color-text);
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.title {
+  font-family: var(--font-ui);
+  font-size: var(--text-meta);
+  letter-spacing: 0.08em;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 64px tall so it's touchable, but the visible rail stays thin. */
+.track {
+  display: flex;
+  align-items: center;
+  min-height: var(--touch-target-min);
+  margin: calc(var(--touch-target-min) / -2 + 8px) 0;
+  cursor: pointer;
+}
+
+.rail {
+  width: 100%;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--color-accent-dim);
+  overflow: hidden;
+}
+
+.fill {
+  width: 100%;
+  height: 100%;
+  transform-origin: left center;
+  background: var(--color-accent);
+}
+
+.time {
+  flex: none;
+  font-family: var(--font-ui);
+  font-size: var(--text-meta);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-muted);
+}

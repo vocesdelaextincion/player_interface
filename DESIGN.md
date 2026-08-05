@@ -54,6 +54,7 @@ Photos are shown full color, as shot — no color grading. Color consistency acr
 |---|---|---|
 | `--text-display` | `clamp(56px, 7.5vh, 88px)` | Species name — the Active hero |
 | `--text-display-sub` | `clamp(24px, 3vh, 34px)` | Recording title, italic, beneath the species |
+| `--text-menu` | `clamp(22px, 2.8vh, 32px)` | Recording menu items, Active — sans, not serif |
 | `--text-staff` | `40px` | Admin / Locked headings (toned down on purpose) |
 | `--text-body` | `18px` | Admin action buttons |
 | `--text-meta` | `14px` | Tags, timecodes, hints — uppercase + letter-spaced where it's a label |
@@ -78,7 +79,7 @@ Hard rule for the old kiosk machine: animate `transform` and `opacity` only, one
 ## Layout — per state
 
 - **Idle:** full-bleed video, played slowed and silent, `object-fit: cover`, behind a flat dimming veil. Random clip order, a 1.2s fade through black between them. The only chrome is one line of sans instruction, bottom-centred, letter-spaced — an invitation, not a control.
-- **Active:** full-bleed carousel, one recording centered at a time. Tapping the hero image plays it in place — play/pause overlay + scrub bar directly on the photo, title + tag beneath. Large arrow buttons (left/right edges) to move between recordings — tap only, no swipe/gesture input anywhere; the touchscreen may not support gestures reliably. Tag-filter chips in a row along the top edge; active chip in `accent`.
+- **Active:** full-bleed background photograph with a gradient running inward from the menu side, so recording titles sit on near-solid black while the far side of the image stays clean. Menu of 5 recordings, vertically centred, left or right per the background's filename. Titles are sans, not the display serif — they're controls, and they hold the line with the idle prompt. Playing item in `accent`. Arrows sit in the outer margin, clear of the menu. Tap only, no swipe — the touchscreen may not support gestures reliably.
 - **Admin / Locked:** same theme (dark bg, same type/accent), toned down — no ambient animation, flat and static, so it clearly reads as a distinct, staff-only mode.
 
 ## Touch targets

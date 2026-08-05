@@ -6,6 +6,7 @@ interface AudioPlayer {
   isPlaying: boolean
   currentTime: number
   durationSec: number
+  play: () => void
   toggle: () => void
   seek: (fraction: number) => void
 }
@@ -28,6 +29,12 @@ export function useAudioPlayer(src: string | undefined, gain = 1): AudioPlayer {
     setLocalPlaying(false)
     setIsPlaying(false)
   }, [setIsPlaying])
+
+  // Safe to call straight after a source change: the element buffers and starts when ready.
+  const play = useCallback(() => {
+    const el = audioElRef.current
+    if (el) void el.play().catch(() => {})
+  }, [])
 
   const toggle = useCallback(() => {
     const el = audioElRef.current
@@ -106,5 +113,5 @@ export function useAudioPlayer(src: string | undefined, gain = 1): AudioPlayer {
     }
   }, [setIsPlaying, stop])
 
-  return { audioElRef, isPlaying, currentTime, durationSec, toggle, seek }
+  return { audioElRef, isPlaying, currentTime, durationSec, play, toggle, seek }
 }

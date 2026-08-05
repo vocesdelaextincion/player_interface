@@ -38,6 +38,9 @@
      crowds the hero at 768p. Still not responsive design — no breakpoints, just fluid. */
   --text-display: clamp(56px, 7.5vh, 88px);
   --text-display-sub: clamp(24px, 3vh, 34px);
+  /* Recording menu items. Sans, not the display serif — the Active menu is a list of controls,
+     and it reads as one family with the idle prompt. */
+  --text-menu: clamp(22px, 2.8vh, 32px);
   --text-staff: 40px;
   --text-body: 18px;
   --text-meta: 14px;

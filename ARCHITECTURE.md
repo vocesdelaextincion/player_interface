@@ -3,7 +3,7 @@
 ## States
 
 - **Idle** — silent, slowed video, default resting screen. A random clip plays at reduced speed, fades through black, and another random clip follows, indefinitely. Footage sits behind a dimming veil with one line of instruction ("Toca la pantalla para comenzar") bottom-centred. No audio. Any touch → Active.
-- **Active** — full-bleed carousel, one recording centered at a time, tag-filter chip row above. Tap the hero image to play/pause in place. No touch for 45s **and** no audio playing → back to Idle (a playing track defers the timer until it ends).
+- **Active** — a carousel of background screens, each listing 5 recordings as tappable menu items. The background's filename decides which side the menu sits on. Tap an item to play it; tap it again to pause. A player bar (progress + pause) is fixed bottom-centre and survives page turns. No touch for 45s **and** no audio playing → back to Idle (a playing track defers the timer until it ends).
 - **Admin** — password-gated, opened by F4 from any state. Opening the prompt stops playback. Wrong password: shake feedback, stay on prompt. Esc cancels back to previous state. Actions: Close app, Restart app, Lock.
 - **Locked** — freezes all touch input (screen-cleaning mode); only F4 is listened for. Unlocked the same way it was entered (F4 + password) → returns to Idle.
 
@@ -29,13 +29,20 @@ No backend, no internet. Audio, images, and video are bundled in the repo.
 
 ```
 media/
-  audio/            *.flac (*.mp3 also accepted)
-  images/           *.jpg
-  videos/           *.mp4   — idle footage, 1080p, no audio track
-  videos/masters/   *.mp4   — 4K originals, deliberately outside the glob
+  audio/                 *.flac (*.mp3 also accepted)
+  images/                *.jpg
+  backgrounds/           *.jpg   — Active screens, 1920x1080
+  backgrounds/masters/   *.jpg   — full-res originals, outside the glob
+  videos/                *.mp4   — idle footage, 1080p, no audio track
+  videos/masters/        *.mp4   — 4K originals, outside the glob
 content/
   recordings.json
 ```
+
+Background filenames are load-bearing: `left_menu2.jpg` means "on this screen, put the recording
+menu on the left". The pattern is `(left|right)_menu<n>.jpg`; anything else (`admin_menu.jpg`) is
+skipped by the carousel. Left and right sets are interleaved so the menu alternates sides on every
+page turn rather than staying put for four screens.
 
 Idle footage is bundled by a separate glob and is **not** part of `recordings.json` — clips aren't
 tied to recordings, they're picked at random. Source material comes off the camera at 4K and ~85
