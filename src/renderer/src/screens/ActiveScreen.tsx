@@ -114,21 +114,17 @@ export function ActiveScreen(): React.JSX.Element {
       </AnimatePresence>
 
       <div className={styles.pager}>
-        <button
-          className={styles.arrow}
-          onClick={() => goTo(-1)}
-          disabled={pages.length <= 1}
-          aria-label="Anterior"
-        >
-          ‹
+        <button className={styles.arrow} onClick={() => goTo(-1)} disabled={pages.length <= 1}>
+          <span className={styles.arrowGlyph} aria-hidden="true">
+            ‹
+          </span>
+          <span className={styles.arrowLabel}>Anterior</span>
         </button>
-        <button
-          className={styles.arrow}
-          onClick={() => goTo(1)}
-          disabled={pages.length <= 1}
-          aria-label="Siguiente"
-        >
-          ›
+        <button className={styles.arrow} onClick={() => goTo(1)} disabled={pages.length <= 1}>
+          <span className={styles.arrowLabel}>Siguiente</span>
+          <span className={styles.arrowGlyph} aria-hidden="true">
+            ›
+          </span>
         </button>
       </div>
 
