@@ -4,11 +4,12 @@ import { usePlayback } from './usePlayback'
 import { IdleScreen } from '../screens/IdleScreen'
 import { RecommendationsScreen } from '../screens/RecommendationsScreen'
 import { ActiveScreen } from '../screens/ActiveScreen'
+import { FarewellScreen } from '../screens/FarewellScreen'
 import { AdminScreen } from '../screens/AdminScreen'
 import { LockedScreen } from '../screens/LockedScreen'
 import { duration, easeCinematic } from '../theme'
 
-type ScreenState = 'idle' | 'recommendations' | 'active' | 'admin' | 'locked'
+type ScreenState = 'idle' | 'recommendations' | 'active' | 'farewell' | 'admin' | 'locked'
 
 // `previous` is what Esc returns to, and it decides where a successful password lands —
 // so it has to be state, not a ref: the Admin render reads it.
@@ -18,6 +19,10 @@ interface Screen {
 }
 
 const INACTIVITY_TIMEOUT_MS = 45_000
+
+// The cap on a single visit. Unlike the inactivity timeout this one cannot be reset, deferred or
+// touched away — it is what keeps one visitor from holding the exhibit for an afternoon.
+const VISIT_LIMIT_MS = 90_000
 
 export function AppShell(): React.JSX.Element {
   const [screen, setScreen] = useState<Screen>({ current: 'idle', previous: 'idle' })
@@ -31,6 +36,7 @@ export function AppShell(): React.JSX.Element {
   // Stable so the interstitials' hold timers aren't restarted by an unrelated re-render.
   const goToRecommendations = useCallback(() => goTo('recommendations'), [goTo])
   const goToActive = useCallback(() => goTo('active'), [goTo])
+  const goToIdle = useCallback(() => goTo('idle'), [goTo])
 
   // F4 from Locked routes here too, but only as far as the password gate: AdminScreen reads
   // `cameFromLocked` and resolves straight to Idle on success, per ARCHITECTURE.md's direct
@@ -53,7 +59,22 @@ export function AppShell(): React.JSX.Element {
     return () => window.removeEventListener('keydown', handleKeydown)
   }, [openAdmin])
 
-  // Active -> Idle after 45s with no touch, deferred while a track is playing.
+  // Active -> Farewell 90s after the station screen appears, whatever the visitor is doing.
+  // Deliberately none of the things the inactivity timer below is: no pointer reset, no deferral
+  // while audio plays. It is also what makes that deferral safe — sounds loop now, so without a
+  // hard cap above it a single playing station would hold Idle off indefinitely.
+  useEffect(() => {
+    if (state !== 'active') return
+
+    const timer = setTimeout(() => {
+      requestStop()
+      goTo('farewell')
+    }, VISIT_LIMIT_MS)
+
+    return () => clearTimeout(timer)
+  }, [state, goTo, requestStop])
+
+  // Active -> Idle after 45s with no touch, deferred while a sound is playing.
   useEffect(() => {
     if (state !== 'active' || isPlaying) return
 
@@ -83,6 +104,7 @@ export function AppShell(): React.JSX.Element {
         {state === 'idle' && <IdleScreen onActivate={goToRecommendations} />}
         {state === 'recommendations' && <RecommendationsScreen onDone={goToActive} />}
         {state === 'active' && <ActiveScreen />}
+        {state === 'farewell' && <FarewellScreen onDone={goToIdle} />}
         {state === 'admin' && (
           <AdminScreen
             cameFromLocked={previousState === 'locked'}
