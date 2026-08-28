@@ -11,12 +11,15 @@ hours of wall-clock time — none of it can be verified from the build machine.
 - [ ] Admin PIN changed from the default in `src/renderer/src/admin.ts` (digits only — the keypad
       cannot enter anything else)
 - [ ] Real recordings and photography in `media/`, `content/recordings.json` updated
+- [ ] Idle footage encoded from its master (`bun run encode-idle-video <master> --start s --end s`)
+      — never drop a camera file straight into `media/videos/`
 - [ ] `bun run blur-backgrounds` re-run after any background was added or replaced — a missing
       `*.blur.jpg` warns to the console and that screen simply never softens
 
 ## State machine (`ARCHITECTURE.md`)
 
 - [ ] Idle: footage plays slowed and silent; no UI chrome but the instruction line
+- [ ] Idle loops cleanly — watch the seam at the end of the clip, there should be no hitch or flash
 - [ ] Idle → Recommendations on any touch
 - [ ] Recommendations holds ~5s and moves to Active on its own, with nothing to press
 - [ ] Active → Idle after 45s of no touch with nothing playing

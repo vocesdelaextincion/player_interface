@@ -49,18 +49,10 @@ export function IdleScreen({ onActivate }: { onActivate: () => void }): React.JS
     return () => el.removeEventListener('loadeddata', handleLoadedData)
   }, [index])
 
-  const handleEnded = useCallback(() => {
-    // A single clip has nothing to cut to — loop it in place instead of fading to itself.
-    if (videos.length <= 1) {
-      const el = videoRef.current
-      if (el) {
-        el.currentTime = 0
-        void el.play().catch(() => {})
-      }
-      return
-    }
-    setVisible(false)
-  }, [])
+  // A single clip has nothing to cut to, so it loops on the element instead (see `loop` below)
+  // and never reaches this. With more than one, the clip fades out and `handleFadeComplete`
+  // picks the next.
+  const handleEnded = useCallback(() => setVisible(false), [])
 
   // Swap the source only once the fade-out has finished, so exactly one clip is ever decoding
   // (ARCHITECTURE.md: one full-bleed animated layer at a time). `visible` stays false here —
@@ -81,6 +73,10 @@ export function IdleScreen({ onActivate }: { onActivate: () => void }): React.JS
           muted
           playsInline
           preload="auto"
+          // Native looping rather than restarting on 'ended': the round trip through React
+          // shows a hitch at the seam, and with one clip that seam is the only cut the idle
+          // screen ever makes.
+          loop={videos.length <= 1}
           onEnded={handleEnded}
           initial={{ opacity: 0 }}
           animate={{ opacity: visible ? 1 : 0 }}

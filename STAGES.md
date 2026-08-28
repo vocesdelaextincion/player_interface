@@ -146,3 +146,23 @@ the console and the screen simply never softens.
 
 The admin password became a digits-only PIN, since the keypad is now the primary way in. It is
 still the default in `src/renderer/src/admin.ts` and still has to be changed before install.
+
+## Stage 10 — Idle footage replaced
+- [x] `voces_background.mkv` (4K VP9, 3:00, 306MB) trimmed 50s off the head and 20s off the tail
+- [x] Re-encoded to 1080p H.264, audio stripped — 1:50, 95MB at 7.3 Mbps
+- [x] The four `microvoces-*` clips removed; this is now the only idle clip
+- [x] `scripts/encode-idle-video.mjs` + `bun run encode-idle-video`, so the recipe isn't folklore
+- [x] Single clip loops on the video element rather than through the `ended` handler
+
+Bitrate is deliberately in line with the clips it replaces (they ran 7-13 Mbps), so nothing about
+the decode load is new territory for the kiosk — only the running time is. It plays at the same
+`idleVideoPlaybackRate = 0.5` as before, which on this 23.976fps source means ~12 unique frames a
+second and a loop lasting about 3:40 on screen.
+
+The file is 95MB against the 43MB of the four it replaces. It stays that size on purpose: matching
+the encode profile already proven on this hardware was worth more than the disk, and the repo
+already carries far larger masters and FLAC.
+
+Native `loop` replaced the old restart-on-`ended` branch. That branch worked, but the round trip
+through React showed a hitch at the seam — invisible when it happened every 12 seconds between
+different clips, obvious when it is the only cut the screen ever makes.

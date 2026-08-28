@@ -2,7 +2,7 @@
 
 ## States
 
-- **Idle** — silent, slowed video, default resting screen. A random clip plays at reduced speed, fades through black, and another random clip follows, indefinitely. Footage sits behind a dimming veil with one line of instruction ("Toca la pantalla para comenzar") bottom-centred. No audio. Any touch → Recommendations.
+- **Idle** — silent, slowed video, default resting screen. The clip plays at reduced speed and loops; where there is more than one, each fades through black into another picked at random, indefinitely. Footage sits behind a dimming veil with one line of instruction ("Toca la pantalla para comenzar") bottom-centred. No audio. Any touch → Recommendations.
 - **Recommendations** — one screen of usage notes over the blurred exhibit photograph. Takes no input; holds 5s and moves on by itself. It exists because Active deliberately says nothing until a sound is playing: the icons carry no titles, and combining them is not something a visitor would try unprompted.
 - **Active** — a carousel of station screens, each holding 4 recordings as play/stop icons. The background's filename decides which side the icons sit on. Tap an icon to start that recording; tap it again to stop it. Sounds layer freely and loop until stopped, so a station is a mix rather than a playlist. The recording most recently started is named in the opposite column, and the whole photograph softens while anything is sounding. No touch for 45s **and** nothing playing → back to Idle. **90s after Active appears → Farewell, unconditionally.**
 - **Farewell** — the end of a capped visit. Takes no input; holds 6s → Idle.
@@ -43,7 +43,7 @@ media/
   backgrounds/           *.blur.jpg — baked blurs, generated, small on purpose
   backgrounds/masters/   *.jpg   — full-res originals, outside the glob
   videos/                *.mp4   — idle footage, 1080p, no audio track
-  videos/masters/        *.mp4   — 4K originals, outside the glob
+  videos/masters/                — camera originals, outside the glob
 content/
   recordings.json
 ```
@@ -62,10 +62,17 @@ buys — they upscale invisibly at a fraction of the decode cost. A missing blur
 simply never softens.
 
 Idle footage is bundled by a separate glob and is **not** part of `recordings.json` — clips aren't
-tied to recordings, they're picked at random. Source material comes off the camera at 4K and ~85
-Mbps, which a kiosk-grade machine cannot decode; deliverables are re-encoded to 1080p with the audio
-stream stripped. The masters live in `videos/masters/`, one level below the non-recursive glob, so
-they stay in the repo without reaching the build.
+tied to recordings. Source material comes off the camera at 4K and tens of Mbps, which a
+kiosk-grade machine cannot decode; deliverables are 1080p H.264 with the audio stream stripped,
+produced by `bun run encode-idle-video <master> [--start s] [--end s]`. The masters live in
+`videos/masters/`, one level below the non-recursive glob, so they stay in the repo without
+reaching the build.
+
+The catalog is currently **one clip**, `voces_background.mp4` — 1:50 cut out of a three-minute
+master, played at half speed, so a loop lasts about 3:40 on screen. With one clip Idle loops it on
+the video element itself rather than cycling: the fade-through-black machinery only engages with
+two or more, and looping natively avoids a visible hitch at the seam. Drop more clips into
+`media/videos/` and the random cycle comes back on its own.
 
 Audio is lossless FLAC — the kiosk plays from local disk with no bandwidth constraint, so there's
 no reason to throw quality away. The loader's glob is **extension-scoped** (`*.{flac,mp3}`): an
