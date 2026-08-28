@@ -7,12 +7,14 @@ interface AdminScreenProps {
   cameFromLocked: boolean
   onUnlock: () => void
   onLock: () => void
+  onCancel: () => void
 }
 
 export function AdminScreen({
   cameFromLocked,
   onUnlock,
-  onLock
+  onLock,
+  onCancel
 }: AdminScreenProps): React.JSX.Element {
   const [authenticated, setAuthenticated] = useState(false)
 
@@ -23,7 +25,7 @@ export function AdminScreen({
     else setAuthenticated(true)
   }
 
-  if (!authenticated) return <PasswordPrompt onSuccess={handleSuccess} />
+  if (!authenticated) return <PasswordPrompt onSuccess={handleSuccess} onCancel={onCancel} />
 
   return (
     <StaffFrame badge="Panel de administración">
@@ -39,7 +41,12 @@ export function AdminScreen({
           Cerrar aplicación
         </button>
       </div>
-      <p className={styles.hint}>Esc para volver</p>
+
+      {/* Outside the action group and quieter than it: this leaves the panel rather than doing
+          anything on the machine. Esc still does the same for staff with a keyboard. */}
+      <button className={styles.back} onClick={onCancel}>
+        Volver
+      </button>
     </StaffFrame>
   )
 }

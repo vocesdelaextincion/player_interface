@@ -24,6 +24,12 @@ const INACTIVITY_TIMEOUT_MS = 45_000
 // touched away — it is what keeps one visitor from holding the exhibit for an afternoon.
 const VISIT_LIMIT_MS = 90_000
 
+// The kiosk ships without a keyboard, so Admin needs a touch way in. A long press rather than a
+// tap, in one corner rather than anywhere: a visitor has no reason to hold a bare corner of the
+// screen for three seconds, and staff can be told where it is in one sentence.
+const ADMIN_HOLD_MS = 3_000
+const ADMIN_CORNER = 0.12
+
 export function AppShell(): React.JSX.Element {
   const [screen, setScreen] = useState<Screen>({ current: 'idle', previous: 'idle' })
   const { current: state, previous: previousState } = screen
@@ -37,6 +43,10 @@ export function AppShell(): React.JSX.Element {
   const goToRecommendations = useCallback(() => goTo('recommendations'), [goTo])
   const goToActive = useCallback(() => goTo('active'), [goTo])
   const goToIdle = useCallback(() => goTo('idle'), [goTo])
+
+  const cancelAdmin = useCallback(() => {
+    setScreen((s) => (s.current === 'admin' ? { current: s.previous, previous: 'admin' } : s))
+  }, [])
 
   // F4 from Locked routes here too, but only as far as the password gate: AdminScreen reads
   // `cameFromLocked` and resolves straight to Idle on success, per ARCHITECTURE.md's direct
@@ -52,11 +62,45 @@ export function AppShell(): React.JSX.Element {
       if (event.key === 'F4') {
         openAdmin()
       } else if (event.key === 'Escape') {
-        setScreen((s) => (s.current === 'admin' ? { current: s.previous, previous: 'admin' } : s))
+        cancelAdmin()
       }
     }
     window.addEventListener('keydown', handleKeydown)
     return () => window.removeEventListener('keydown', handleKeydown)
+  }, [openAdmin, cancelAdmin])
+
+  // Listened for on the window rather than rendered as a hotspot element, deliberately: an
+  // element on top would swallow the corner, and Locked stops touches at its own frame
+  // (StaffFrame) — preventDefault there doesn't stop the event reaching this listener, so the
+  // one screen that has to be unlockable without a keyboard still is.
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout> | null = null
+
+    function cancelHold(): void {
+      if (timer !== null) {
+        clearTimeout(timer)
+        timer = null
+      }
+    }
+
+    function handlePointerDown(event: PointerEvent): void {
+      const inCorner =
+        event.clientX < window.innerWidth * ADMIN_CORNER &&
+        event.clientY > window.innerHeight * (1 - ADMIN_CORNER)
+      if (!inCorner) return
+      cancelHold()
+      timer = setTimeout(openAdmin, ADMIN_HOLD_MS)
+    }
+
+    window.addEventListener('pointerdown', handlePointerDown)
+    window.addEventListener('pointerup', cancelHold)
+    window.addEventListener('pointercancel', cancelHold)
+    return () => {
+      cancelHold()
+      window.removeEventListener('pointerdown', handlePointerDown)
+      window.removeEventListener('pointerup', cancelHold)
+      window.removeEventListener('pointercancel', cancelHold)
+    }
   }, [openAdmin])
 
   // Active -> Farewell 90s after the station screen appears, whatever the visitor is doing.
@@ -110,6 +154,7 @@ export function AppShell(): React.JSX.Element {
             cameFromLocked={previousState === 'locked'}
             onUnlock={() => goTo('idle')}
             onLock={() => goTo('locked')}
+            onCancel={cancelAdmin}
           />
         )}
         {state === 'locked' && <LockedScreen />}
