@@ -39,13 +39,16 @@ Sample media is placeholder only (tone mp3s, labeled color blocks) — swap for 
 - [x] Any touch → Active
 
 ## Stage 5 — Active screen: browse + player ✅
-- [x] Full-bleed carousel, one recording centered
+- [x] Full-bleed carousel of station backgrounds, menu side per filename
 - [x] Left/right arrow nav (tap only, no gestures)
-- [x] Tag-filter chip row
-- [x] Tap hero image → play/pause in place, overlay controls + scrub bar
+- [x] Tap a recording → play/pause in place
 - [x] Single reusable `<audio>` element; switching recordings stops the current one
 - [x] Track end: stop, stay put (no auto-advance)
-- [x] Scrub bar seekable by touch
+- [x] Player bar with a touch-seekable scrub bar
+
+Written against the hero-image player this stage started as; commit `a8ad776` replaced that with
+the background carousel and dropped the centred hero and the tag-filter chip row. Stage 9 then
+replaced the rest of it — see there for what the screen actually does now.
 
 ## Stage 6 — Admin & Locked screens ✅
 - [x] Password prompt (toned-down theme), shake feedback on wrong password
@@ -60,6 +63,10 @@ one password gate — `AdminScreen` branches on `cameFromLocked`.
 
 Close/Restart are the first renderer actions needing the main process, so this stage added
 `app:quit` / `app:restart` IPC (`src/main/index.ts`) exposed as `window.api` via the preload.
+
+Superseded by Stage 9 on the way in: the gate is no longer F4-and-type. A 3s press in the
+bottom-left corner opens it too, and the password is a PIN on an on-screen keypad — Locked
+included, which is why the corner press is listened for on the window rather than on the frame.
 
 ## Stage 7 — Styling pass ✅
 - [x] Full `DESIGN.md` token set applied across every screen
@@ -105,3 +112,37 @@ it needs a maintainer email nobody has supplied.
 
 The two open items are genuinely blocked on the physical machine — a soak test and a touch pass can't
 be faked from a build box. `CHECKLIST.md` is written so whoever has the kiosk can run them.
+
+## Stage 9 — Client feedback, round 1
+From `voces`, after showing the Stage 8 build. Three items break invariants Stages 3-5 were built
+on, so this is a redesign of the visitor interaction rather than a polish pass.
+
+- [x] Four sounds per station, not five
+- [x] Visible labels on the carousel arrows
+- [x] Menu reduced to play/stop icons; titles moved to a label in the free column
+- [x] Sounds layer and loop — one `<audio>` per slot on the current station, no transport bar
+- [x] Baked blur across the whole photograph while a station sounds
+- [x] Recommendations screen on the way out of Idle, auto-advancing
+- [x] 90s hard cap on a visit, ending in a farewell screen
+- [x] Admin reachable by a 3s corner press; PIN entered on an on-screen keypad
+- [ ] Confirm four concurrent FLAC decodes hold on the kiosk — **needs hardware**, see `CHECKLIST.md`
+
+The mixing change is the one with teeth. `useAudioPlayer` was built around the single element
+ARCHITECTURE.md's "Long-run stability" section asks for, and layering needs one per sound; the
+replacement (`useSoundboard`) scopes them to the *current station* and tears them down on every
+page turn, so the count is bounded at four rather than growing with the catalog. Whether four
+simultaneous decodes hold on a Windows 8 kiosk can only be answered on the machine. If they don't,
+cap concurrency or re-encode the catalog before reaching for anything cleverer.
+
+The 45s inactivity timer kept its `isPlaying` guard, against the first reading of the note. Looping
+sounds would otherwise defer the return to Idle forever — but the 90s cap sits above it and cannot
+be deferred, so the guard is bounded now and a visitor listening without touching isn't cut off at
+45 seconds.
+
+`filter: blur()` is not used anywhere and should not be: the blurred backgrounds are baked by
+`bun run blur-backgrounds` and crossfaded on `opacity`, which keeps the Stage 8 animation audit
+true. **Run that script whenever a background is added or replaced** — a missing variant warns to
+the console and the screen simply never softens.
+
+The admin password became a digits-only PIN, since the keypad is now the primary way in. It is
+still the default in `src/renderer/src/admin.ts` and still has to be changed before install.
