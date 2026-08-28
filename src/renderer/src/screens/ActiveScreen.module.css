@@ -54,8 +54,7 @@
   z-index: 2;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  width: 40vw;
+  gap: 18px;
 }
 
 .menuLeft {
@@ -66,36 +65,27 @@
   right: 6vw;
 }
 
-/* A panel, not bare text: on a photograph, the surface is what tells a visitor the row can be
-   pressed. Glyph leads on the left menu and trails on the right, mirroring the layout. */
+/* The titles that used to sit beside these glyphs now live in the description panel opposite, so
+   the row is the control and nothing else. A disc rather than a wide panel: four identical
+   pressable shapes read as a set of things to try together, which is what layering asks for. */
 .item,
 .itemPlaying {
   display: flex;
   align-items: center;
-  gap: 20px;
-  width: 100%;
+  justify-content: center;
+  width: 88px;
+  height: 88px;
+  min-width: var(--touch-target-min);
   min-height: var(--touch-target-min);
-  padding: 14px 26px;
   border: none;
-  border-radius: 14px;
+  border-radius: 50%;
   background: var(--color-row);
   color: var(--color-text);
-  font-family: var(--font-ui);
-  font-size: var(--text-menu);
-  font-weight: 400;
-  letter-spacing: 0.03em;
-  line-height: 1.25;
-  text-align: left;
   cursor: pointer;
 }
 
-.menuRight .item,
-.menuRight .itemPlaying {
-  flex-direction: row-reverse;
-  text-align: right;
-}
-
-.item:active {
+.item:active,
+.itemPlaying:active {
   background: var(--color-row-press);
 }
 
@@ -104,17 +94,8 @@
 }
 
 .itemGlyph {
-  flex: none;
-  width: 1.1em;
-  font-size: 0.62em;
+  font-size: 26px;
   line-height: 1;
-  color: var(--color-text);
-  text-align: center;
-}
-
-.itemTitle {
-  flex: 1;
-  min-width: 0;
 }
 
 /* Along the top edge rather than the side margins — the menu owns one whole side of the screen,

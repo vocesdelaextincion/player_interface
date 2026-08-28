@@ -1,10 +1,9 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { AnimatePresence, motion, type Variants } from 'framer-motion'
 import styles from './ActiveScreen.module.css'
 import { recordings, type Recording } from '../content/recordings'
 import { menuBackgrounds } from '../content/backgrounds'
-import { ActivePlayerBar } from './ActivePlayerBar'
-import { useAudioPlayer } from '../state/useAudioPlayer'
+import { useSoundboard } from '../state/useSoundboard'
 import { duration, easeCinematic } from '../theme'
 
 const PAGE_SIZE = 4
@@ -13,6 +12,10 @@ const PAGE_SIZE = 4
 // repeating it. Delete this and let the page count follow the recording count alone once the
 // real catalog lands.
 const PLACEHOLDER_PAGES = 4
+
+// Stable identity: useSoundboard rebuilds its elements whenever the station changes, so an
+// empty catalog must not hand it a fresh array on every render.
+const NO_STATION: Recording[] = []
 
 const slideVariants: Variants = {
   enter: (dir: number) => ({ x: dir > 0 ? '100%' : '-100%', opacity: 0 }),
@@ -36,21 +39,11 @@ export function ActiveScreen(): React.JSX.Element {
 
   const [page, setPage] = useState(0)
   const [direction, setDirection] = useState(1)
-  const [selectedId, setSelectedId] = useState<string | null>(null)
 
-  const selected = recordings.find((r) => r.id === selectedId)
+  const station = pages[page] ?? NO_STATION
   const background = menuBackgrounds[page % Math.max(1, menuBackgrounds.length)]
 
-  const { audioElRef, isPlaying, currentTime, durationSec, play, toggle, seek } = useAudioPlayer(
-    selected?.audioSrc,
-    selected?.gain
-  )
-
-  // Runs after the <audio> src attribute has been updated, so this starts the newly picked
-  // recording rather than replaying the previous one.
-  useEffect(() => {
-    if (selectedId) play()
-  }, [selectedId, play])
+  const { playingSlots, toggle } = useSoundboard(station)
 
   function goTo(step: number): void {
     if (pages.length <= 1) return
@@ -58,18 +51,8 @@ export function ActiveScreen(): React.JSX.Element {
     setPage((current) => (current + step + pages.length) % pages.length)
   }
 
-  function handleSelect(recording: Recording): void {
-    if (recording.id === selectedId) {
-      toggle()
-      return
-    }
-    setSelectedId(recording.id)
-  }
-
   return (
     <div className={styles.screen}>
-      <audio ref={audioElRef} src={selected?.audioSrc} preload="auto" />
-
       <AnimatePresence custom={direction} initial={false}>
         <motion.div
           key={page}
@@ -92,20 +75,20 @@ export function ActiveScreen(): React.JSX.Element {
           )}
 
           <nav className={background?.side === 'right' ? styles.menuRight : styles.menuLeft}>
-            {pages[page]?.map((recording, slot) => {
-              const isCurrent = recording.id === selectedId
+            {station.map((recording, slot) => {
+              const isPlaying = playingSlots.has(slot)
               return (
                 <button
                   // The same recording can appear on more than one page while the catalog is
                   // padded out, so the slot has to be part of the key.
                   key={`${page}-${slot}-${recording.id}`}
-                  className={isCurrent ? styles.itemPlaying : styles.item}
-                  onClick={() => handleSelect(recording)}
+                  className={isPlaying ? styles.itemPlaying : styles.item}
+                  onClick={() => toggle(slot)}
+                  aria-label={recording.title}
                 >
                   <span className={styles.itemGlyph} aria-hidden="true">
-                    {isCurrent && isPlaying ? '❚❚' : '▶'}
+                    {isPlaying ? '■' : '▶'}
                   </span>
-                  <span className={styles.itemTitle}>{recording.title}</span>
                 </button>
               )
             })}
@@ -127,17 +110,6 @@ export function ActiveScreen(): React.JSX.Element {
           </span>
         </button>
       </div>
-
-      {selected && (
-        <ActivePlayerBar
-          title={selected.title}
-          isPlaying={isPlaying}
-          currentTime={currentTime}
-          durationSec={durationSec}
-          onTogglePlay={toggle}
-          onSeek={seek}
-        />
-      )}
     </div>
   )
 }
