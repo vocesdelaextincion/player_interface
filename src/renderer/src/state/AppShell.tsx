@@ -2,12 +2,13 @@ import { useCallback, useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { usePlayback } from './usePlayback'
 import { IdleScreen } from '../screens/IdleScreen'
+import { RecommendationsScreen } from '../screens/RecommendationsScreen'
 import { ActiveScreen } from '../screens/ActiveScreen'
 import { AdminScreen } from '../screens/AdminScreen'
 import { LockedScreen } from '../screens/LockedScreen'
 import { duration, easeCinematic } from '../theme'
 
-type ScreenState = 'idle' | 'active' | 'admin' | 'locked'
+type ScreenState = 'idle' | 'recommendations' | 'active' | 'admin' | 'locked'
 
 // `previous` is what Esc returns to, and it decides where a successful password lands —
 // so it has to be state, not a ref: the Admin render reads it.
@@ -26,6 +27,10 @@ export function AppShell(): React.JSX.Element {
   const goTo = useCallback((next: ScreenState) => {
     setScreen((s) => ({ current: next, previous: s.current }))
   }, [])
+
+  // Stable so the interstitials' hold timers aren't restarted by an unrelated re-render.
+  const goToRecommendations = useCallback(() => goTo('recommendations'), [goTo])
+  const goToActive = useCallback(() => goTo('active'), [goTo])
 
   // F4 from Locked routes here too, but only as far as the password gate: AdminScreen reads
   // `cameFromLocked` and resolves straight to Idle on success, per ARCHITECTURE.md's direct
@@ -75,7 +80,8 @@ export function AppShell(): React.JSX.Element {
         exit={{ opacity: 0 }}
         transition={{ duration: duration.state, ease: easeCinematic }}
       >
-        {state === 'idle' && <IdleScreen onActivate={() => goTo('active')} />}
+        {state === 'idle' && <IdleScreen onActivate={goToRecommendations} />}
+        {state === 'recommendations' && <RecommendationsScreen onDone={goToActive} />}
         {state === 'active' && <ActiveScreen />}
         {state === 'admin' && (
           <AdminScreen
