@@ -7,11 +7,11 @@ import { ActivePlayerBar } from './ActivePlayerBar'
 import { useAudioPlayer } from '../state/useAudioPlayer'
 import { duration, easeCinematic } from '../theme'
 
-const PAGE_SIZE = 5
+const PAGE_SIZE = 4
 
-// TEMPORARY: the catalog holds exactly one screenful of recordings, so the carousel can't be
-// judged without repeating it. Delete this and let the page count follow the recording count
-// alone once the real catalog lands.
+// TEMPORARY: the catalog barely fills one station, so the carousel can't be judged without
+// repeating it. Delete this and let the page count follow the recording count alone once the
+// real catalog lands.
 const PLACEHOLDER_PAGES = 4
 
 const slideVariants: Variants = {
