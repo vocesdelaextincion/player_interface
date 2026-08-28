@@ -8,7 +8,6 @@ export interface Recording {
   /** Linear playback volume, 0-1. Derived from `gainDb`. */
   gain: number
   audioSrc: string
-  imageSrc: string
 }
 
 interface RawRecording {
@@ -18,7 +17,6 @@ interface RawRecording {
   tags: string[]
   gainDb?: number
   audio: string
-  image: string
 }
 
 // The catalog's tracks were recorded at wildly different levels (a 23 LU spread), which on a
@@ -40,12 +38,6 @@ const audioFiles = import.meta.glob('../../../../media/audio/*.{flac,mp3}', {
   import: 'default'
 }) as Record<string, string>
 
-const imageFiles = import.meta.glob('../../../../media/images/*', {
-  eager: true,
-  query: '?url',
-  import: 'default'
-}) as Record<string, string>
-
 function resolveAsset(files: Record<string, string>, relativePath: string): string | undefined {
   const key = Object.keys(files).find((path) => path.endsWith(relativePath))
   return key ? files[key] : undefined
@@ -56,12 +48,9 @@ function loadRecordings(): Recording[] {
 
   for (const raw of rawRecordings as RawRecording[]) {
     const audioSrc = resolveAsset(audioFiles, raw.audio.replace(/^media\//, ''))
-    const imageSrc = resolveAsset(imageFiles, raw.image.replace(/^media\//, ''))
 
-    if (!audioSrc || !imageSrc) {
-      console.warn(
-        `[recordings] skipping "${raw.id}" — missing ${!audioSrc ? raw.audio : raw.image}`
-      )
+    if (!audioSrc) {
+      console.warn(`[recordings] skipping "${raw.id}" — missing ${raw.audio}`)
       continue
     }
 
@@ -71,8 +60,7 @@ function loadRecordings(): Recording[] {
       species: raw.species,
       tags: raw.tags,
       gain: toLinearGain(raw.gainDb),
-      audioSrc,
-      imageSrc
+      audioSrc
     })
   }
 

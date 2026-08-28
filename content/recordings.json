@@ -3,45 +3,50 @@
     "id": "kakui-01",
     "title": "Canto del kakuy",
     "species": "Kakuy",
-    "tags": ["aves"],
+    "tags": [
+      "aves"
+    ],
     "gainDb": -9.5,
-    "audio": "media/audio/kakui.flac",
-    "image": "media/images/sample-quetzal.jpg"
+    "audio": "media/audio/kakui.flac"
   },
   {
     "id": "alicuco-01",
     "title": "Alicucu entre grillos",
     "species": "Alicucu",
-    "tags": ["aves"],
+    "tags": [
+      "aves"
+    ],
     "gainDb": 0.0,
-    "audio": "media/audio/alicuco-grillos.flac",
-    "image": "media/images/sample-jaguar.jpg"
+    "audio": "media/audio/alicuco-grillos.flac"
   },
   {
     "id": "grillos-01",
     "title": "Coro intenso",
     "species": "Grillos",
-    "tags": ["insectos"],
+    "tags": [
+      "insectos"
+    ],
     "gainDb": -0.8,
-    "audio": "media/audio/grillos-intenso.flac",
-    "image": "media/images/sample-rana.jpg"
+    "audio": "media/audio/grillos-intenso.flac"
   },
   {
     "id": "lluvia-01",
-    "title": "Lluvia sobre el galpón",
+    "title": "Lluvia sobre el galp\u00f3n",
     "species": "Paisaje sonoro",
-    "tags": ["ambiente"],
+    "tags": [
+      "ambiente"
+    ],
     "gainDb": -0.6,
-    "audio": "media/audio/lluvia-galpon.flac",
-    "image": "media/images/sample-rana.jpg"
+    "audio": "media/audio/lluvia-galpon.flac"
   },
   {
     "id": "manana-01",
-    "title": "Mañana calurosa",
+    "title": "Ma\u00f1ana calurosa",
     "species": "Paisaje sonoro",
-    "tags": ["ambiente"],
+    "tags": [
+      "ambiente"
+    ],
     "gainDb": -7.2,
-    "audio": "media/audio/manana-calurosa.flac",
-    "image": "media/images/sample-quetzal.jpg"
+    "audio": "media/audio/manana-calurosa.flac"
   }
 ]

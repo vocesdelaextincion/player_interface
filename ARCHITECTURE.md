@@ -38,15 +38,20 @@ No backend, no internet. Audio, images, and video are bundled in the repo.
 ```
 media/
   audio/                 *.flac (*.mp3 also accepted)
-  images/                *.jpg
   backgrounds/           *.jpg   — Active screens, 1920x1080
   backgrounds/           *.blur.jpg — baked blurs, generated, small on purpose
-  backgrounds/masters/   *.jpg   — full-res originals, outside the glob
   videos/                *.mp4   — idle footage, 1080p, no audio track
-  videos/masters/                — camera originals, outside the glob
 content/
   recordings.json
 ```
+
+`media/` holds **only what the app loads** — 194MB against the 943MB it carried when masters lived
+alongside the deliverables. Camera masters and full-res originals moved to `../media-archive/`,
+which nothing in the build reads; the scripts that consume them all take a path argument. See that
+folder's README for the regeneration commands.
+
+Note this does not shrink the git repository: the masters are still in its history, and moving them
+only cleans the working tree.
 
 Background filenames are load-bearing: `left_menu2.jpg` means "on this screen, put the recording
 menu on the left". The pattern is `(left|right)_menu<n>.jpg`; anything else (`admin_menu.jpg`) is
@@ -89,10 +94,14 @@ which `.gitignore` excludes.
   "species": "string",
   "tags": ["string"],
   "gainDb": -9.5,
-  "audio": "media/audio/xxx.flac",
-  "image": "media/images/xxx.jpg"
+  "audio": "media/audio/xxx.flac"
 }
 ```
+
+There is no per-recording image. The Active redesign left nothing that renders one — a station is
+a photograph with unlabelled icons on it, and the label that appears names the recording in words.
+The field outlived its use and was worse than dead weight: a missing image silently dropped the
+whole recording from the catalog.
 
 `gainDb` (optional, defaults to 0) trims playback level per recording. Field recordings arrive at
 very different loudnesses — this catalog spanned 23 LU — and on a kiosk that means a visitor sets a
@@ -107,7 +116,7 @@ been captured 30 dB below full scale.
 
 Catalog is small (<20 recordings) — no search/pagination needed.
 
-Entries with a missing or unloadable audio/image file are skipped at load (console warning only) — the kiosk never shows a broken card.
+Entries with a missing or unloadable audio file are skipped at load (console warning only) — the kiosk never shows a control that plays nothing.
 
 ## Stack
 

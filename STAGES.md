@@ -166,3 +166,23 @@ already carries far larger masters and FLAC.
 Native `loop` replaced the old restart-on-`ended` branch. That branch worked, but the round trip
 through React showed a hitch at the seam — invisible when it happened every 12 seconds between
 different clips, obvious when it is the only cut the screen ever makes.
+
+## Stage 11 — Media working tree trimmed
+- [x] Camera masters and full-res originals moved to `../media-archive/`, outside the project
+- [x] `media/images/` retired — the sample photos were bundled but rendered nowhere
+- [x] `image` dropped from the `recordings.json` schema and its loader
+- [x] `media-archive/README.md` records what each folder is and how to regenerate from it
+
+`media/` went from 943MB to 194MB, and the renderer bundle stopped carrying three sample photos it
+never drew. **This does not shrink the repository** — the masters are still in git history, so
+`.git` stays around 1GB. The point was the working tree, not the clone.
+
+Dropping `image` was the only part that touched code. Nothing had rendered a per-recording photo
+since the Stage 9 redesign: a station *is* a photograph, and the label that appears on tap names
+the recording in words. The field was worse than unused — the loader treated a missing image as
+grounds to skip the entire recording, so an absent placeholder would have silently emptied the
+catalog. Re-adding it later is a field, a glob and a resolve call; the reason to remove it now is
+that leaving it made the archive move a trap.
+
+Nothing in the build reads `media-archive/`. All three asset scripts take a path argument, so they
+keep working by pointing at it — the commands are in that folder's README.

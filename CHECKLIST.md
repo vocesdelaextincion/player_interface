@@ -7,7 +7,8 @@ hours of wall-clock time — none of it can be verified from the build machine.
 
 - [ ] Machine architecture checked — ship the `ia32` build if unsure, it runs on both
 - [ ] App actually launches on the Windows 8 machine (Electron 22 pin; never verified on real hardware)
-- [ ] Screen resolution noted, and images prescaled to it (`bun run prescale-images <sourceDir>`)
+- [ ] Screen resolution noted, and backgrounds prescaled to it
+      (`bun run prescale-images ../media-archive/backgrounds media/backgrounds`)
 - [ ] Admin PIN changed from the default in `src/renderer/src/admin.ts` (digits only — the keypad
       cannot enter anything else)
 - [ ] Real recordings and photography in `media/`, `content/recordings.json` updated
