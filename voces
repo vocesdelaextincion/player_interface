@@ -1,0 +1,7 @@
+- Menu sin teclado (tactil)
+- La lista de reproducción tienen que ser solo los íconos de play/stop.
+- Cuando el usuario hace click en algun audio, una descripción (etiqueta) aparece en la columna no utilizada, el blur alcanza toda la imagen y los sonidos se pueden combinar.
+- Un temporizador de 1 minuto y medio. Hard limit. Haga lo que haga. Muestra una imagen de "despedida"
+- Después de salir de la pantalla idle se muestran algunas "recomendaciones".
+- Cuatro sonidos por estación
+- Agregar label a las flechas de navegación.
