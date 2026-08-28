@@ -46,6 +46,15 @@
   );
 }
 
+/* Lifted over the whole frame once a sound starts, so the label in the far column reads against
+   the same black as the icons rather than against bare photography. */
+.veilFull {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: rgb(var(--rgb-black) / 0.45);
+}
+
 .menuLeft,
 .menuRight {
   position: absolute;
@@ -153,4 +162,54 @@
 .arrow:disabled {
   opacity: 0.25;
   cursor: default;
+}
+
+/* The etiqueta, in whichever column the menu left free. Fraunces here and sans on the controls
+   keeps the split DESIGN.md asks for: the serif names the animal, the sans is the interface. */
+.captionLeft,
+.captionRight {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 38vw;
+}
+
+.captionLeft {
+  left: 6vw;
+  text-align: left;
+}
+
+.captionRight {
+  right: 6vw;
+  text-align: right;
+}
+
+.captionSpecies {
+  font-family: var(--font-display);
+  font-size: var(--text-display);
+  font-weight: 500;
+  line-height: 1.05;
+  color: var(--color-text);
+}
+
+.captionTitle {
+  font-family: var(--font-display);
+  font-size: var(--text-display-sub);
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--color-text);
+}
+
+.captionTags {
+  font-family: var(--font-ui);
+  font-size: var(--text-meta);
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
 }
