@@ -126,8 +126,8 @@ Entries with a missing or unloadable audio file are skipped at load (console war
 - Fonts bundled locally (no network, so no Google Fonts at runtime).
 - UI text: Spanish only.
 - Hardware assumption: touchscreen only. Nothing in the app — visitor or staff — requires a keyboard. F4 and typed digits still work where one happens to be plugged in, but they are never the only way through a screen. Fixed landscape resolution — no responsive breakpoints.
-- Target OS: **Windows 8**. Electron is pinned to 22.3.27, the last release supporting it — which also covers Windows 7/8.1/10/11 (32- and 64-bit), Linux, and macOS. Do not upgrade Electron past 22; see "Target machine and packaging" below.
-- No auto-launch, no crash watchdog — staff starts the app manually.
+- Target OS: **Debian (x86_64)**, on an old desktop with an integrated GeForce 7025. Electron is pinned to 22.3.27 — originally because of Windows 8, now for the reasons in "Target machine and packaging" below. Do not bump it without reading that section.
+- Auto-launch and crash recovery are the OS's job, not the app's: the machine autologins and runs the app in a shell loop that restarts it on any unexpected exit. The app signals a *deliberate* close with exit code 42. See "Session model" below.
 - Admin PIN hardcoded in source, digits only so the on-screen keypad can enter it. A visitor deterrent, not a real security boundary.
 
 ## Long-run stability (old machine, runs all day)
@@ -144,58 +144,135 @@ Entries with a missing or unloadable audio file are skipped at load (console war
 
 ## Target machine and packaging
 
-The kiosk runs **Windows 8**, so this project is pinned to **Electron 22.3.27** — the last Electron
-release that supports Windows 8. Electron 23 moved to Chromium 110 and dropped Windows 7/8/8.1
-entirely; on anything newer than 22, the app does not start on that machine at all.
+The kiosk is an **old desktop running Linux**: a Gigabyte GA-M68MT-S2 (AM3) with an AMD
+Athlon II, an integrated GeForce 7025, a VGA panel with a USB HID touch layer, and a
+mechanical hard disk. It is **fully offline** — no network at the install site, by design.
 
-That pin is load-bearing. Three things follow from it, and none of them should be "tidied up":
+This replaces an earlier plan to ship to a Windows 8 machine. Nothing in `src/` was
+Windows-specific — there is no `win32` code path, no native modules, no serial or GPIO — so
+Windows was only ever a packaging target and the `win:` / `mac:` blocks in
+`electron-builder.yml` are kept only because they cost nothing.
 
-1. **`electron` is pinned exactly (`22.3.27`, no `^`).** A caret would let a `bun update` pull
-   Electron 23+ and silently break the only machine this is for.
-2. **`electron.vite.config.ts` pins build targets to `chrome108` / `node16`.** Vite 7 targets newer
-   browsers by default. Without these, the build succeeds and the kiosk shows a *blank window with no
-   error* — the worst possible failure mode to debug on site.
-3. **Electron 22 is end-of-life** (security patches stopped May 2023). This is acceptable *only*
-   because the kiosk is fully offline by design — no network calls of any kind. Do not reuse this
-   build on an internet-connected machine.
+### The Electron 22 pin
 
-Pinning to 22 costs nothing in reach — it is the widest-compatibility choice available:
+`electron` is pinned to **22.3.27**, exactly, with no caret. **The original reason for that
+pin is gone**: it was the last release supporting Windows 8, and there is no Windows 8
+machine any more. Do not read this section as saying Windows still constrains the project.
 
-| Platform | Support |
-|---|---|
-| Windows 7 / 8 / 8.1 | Yes — the reason for the pin |
-| Windows 10 / 11 | Yes, both 32- and 64-bit |
-| Linux | Yes (AppImage, x64) |
-| macOS | Yes (10.11+) |
+The pin survives on two much weaker legs, and both should be re-examined rather than
+inherited:
 
-Still worth confirming on site: whether the machine is 32- or 64-bit, and its screen resolution. If
-nobody can check the architecture, **ship the `ia32` build** — 32-bit Windows binaries run fine on
-64-bit Windows, so it is the safe default. Resolution matters because the layout is fixed landscape
-and the image prescaler needs a target size.
+1. **It is known-good and nothing is pushing on it.** The machine is offline, so an EOL
+   Chromium carries no practical risk here, and upgrading is not on the critical path for
+   getting the kiosk running.
+2. **The CPU may not be able to run anything newer.** The Athlon II is K10: it has SSE4a but
+   **not SSE4.1 or SSE4.2**. Chromium's x86-64 baseline has risen over the years, so a modern
+   Electron may refuse to start on this hardware (expect `SIGILL`, not a clean error). This is
+   unverified and is the first thing to measure on the machine.
 
-Nothing in the UI depends on a post-Chromium-108 feature — the built bundle was scanned for newer
-APIs (`toSorted`, `Object.groupBy`, etc.) and CSS (`@container`, `@layer`), and uses none. It has
-**not** yet been run on real Windows 8 hardware.
+Until that measurement exists, three things stay as they are:
+
+- **The exact pin, no `^`.** A caret would let a `bun update` pull a newer Electron and
+  silently break the only machine this is for.
+- **`electron.vite.config.ts` pins build targets to `chrome108` / `node16`.** Vite 7 targets
+  newer browsers by default. Without these, the build succeeds and the kiosk shows a *blank
+  window with no error* — the worst possible failure mode to debug on site.
+- **Electron 22 is end-of-life** (security patches stopped May 2023). Acceptable *only*
+  because the kiosk is offline. Do not reuse this build on an internet-connected machine.
+
+Nothing in the UI depends on a post-Chromium-108 feature — the built bundle was scanned for
+newer APIs (`toSorted`, `Object.groupBy`, etc.) and CSS (`@container`, `@layer`), and uses
+none. If the Electron upgrade ever happens, it is a self-contained experiment: bump the
+version, drop the two Vite target pins, confirm the app launches on the hardware.
+
+### What the hardware dictates
+
+These are constraints of the machine, not preferences, and they explain several choices that
+would otherwise look arbitrary:
+
+- **No hardware H.264 decode.** NVIDIA's video decode block (VDPAU) starts at GeForce 8
+  (G80); the 7025 predates it. The idle background video is decoded entirely on the CPU. This
+  is survivable mainly because `idleVideoPlaybackRate = 0.5` halves the frames decoded per
+  wall-second — see "Long-run stability". The video should be encoded at the panel's native
+  resolution, not 1080p; decoding pixels that are then thrown away is the most expensive
+  avoidable thing this machine does.
+- **nouveau is the only driver.** NVIDIA's 304.xx legacy branch, the last to support GeForce
+  7, has not worked with a current X server in a decade. nouveau on NV4x is Mesa's old
+  `nouveau_vieux` path: OpenGL 2.1, no usable GLES2, no reclocking.
+- **Therefore X11, not Wayland.** A single-app Wayland compositor such as `cage` would be a
+  neater fit for a kiosk, but wlroots requires GLES2, which this driver does not provide.
+- **RAM matters more than disk.** The whole of `media/` is ~194MB, so with 4GB installed it
+  stays in the page cache after the first play and the hard disk goes idle. With 2GB — the
+  integrated GPU also carves 128–256MB out of system RAM — it gets evicted and re-read from
+  a spinning disk on every loop, which is audible. An SSD is not needed; 4GB is.
+- **Fixed landscape, touch only.** Unchanged from the original design. The panel's native
+  resolution is what the image prescaler and the video encoder target.
+
+### Session model
+
+The app does not run on a desktop. The machine autologins an unprivileged `kiosk` user on
+tty1, starts X with `startx -- -nocursor`, runs `openbox` as a minimal window manager, and
+then loops:
+
+```
+launch app  →  exit code 42  →  show launcher menu  →  relaunch app
+            →  any other exit →  relaunch app immediately (crash)
+```
+
+Two pieces of this are a contract between the app and the OS config, and neither makes sense
+alone:
+
+- **Exit code 42 means "the visitor-facing app was deliberately closed from the admin
+  screen".** `ipcMain.on('app:quit')` in `src/main/index.ts` uses `app.exit(42)` rather than
+  `app.quit()` so the code actually reaches the shell. Any other exit status is treated as a
+  crash and the app is restarted silently.
+- **The launcher menu is therefore already PIN-gated.** It is only reachable through the
+  existing F4-or-corner-hold → `ADMIN_PIN` gate in `state/AppShell.tsx`; a crash never
+  exposes it. (After several consecutive crashes the loop does fall through to the menu — at
+  that point the kiosk is already broken and an escape hatch is worth more than the gate.)
+
+A window manager is **required**, not decorative: `kiosk: true` / `fullscreen: true` work by
+asking the WM for `_NET_WM_STATE_FULLSCREEN`. With no WM running, the window silently appears
+at its requested 1280×720 and the fullscreen request does nothing.
+
+The launcher menu itself is a small Tk script outside Electron, offering four large touch
+targets: *Voces de la extinción* (relaunch), *Reiniciar*, *Apagar*, and *Terminal*. A second
+Electron instance would match the app's look but costs ~100MB of RAM and several seconds of
+startup on this CPU.
+
+The OS-side configuration — autologin drop-in, `.xinitrc`, the menu script, the openbox
+config, and the polkit rule letting `kiosk` power the machine off — lives in `kiosk/` in this
+repo, deliberately **outside** the `.deb`: the package is reinstalled on every app update and
+must not clobber system configuration each time.
 
 ### Build targets
 
 ```bash
-bun run build:win:zip   # zip, x64 + ia32 — works on Linux/macOS, no wine needed
-bun run build:win       # zip + NSIS installer — needs Windows or wine
-bun run build:linux     # AppImage
+bun run build:linux     # deb — the museum deliverable
+bun run build:win       # zip + NSIS; kept only in case a Windows machine reappears
 bun run build:mac
 ```
 
-`bun run build:win:zip` produces both architectures:
+`bun run build:linux` produces `dist/player-interface-<version>-amd64.deb`, which installs to
+`/opt/player-interface/` — the path the `.xinitrc` loop expects. Install it from a USB stick
+with `apt`, not `dpkg -i`, so dependencies resolve:
 
+```bash
+sudo apt install ./player-interface-<version>-amd64.deb
 ```
-dist/player-interface-<version>-win.zip        # 64-bit
-dist/player-interface-<version>-ia32-win.zip   # 32-bit — the safe default if unsure
-```
 
-Unpack one on the kiosk and run `player-interface.exe` — no installer and no admin rights. This is the
-intended deployment.
+That is the whole deployment story. There is no updater and no network install path; the
+machine is offline and a new build arrives on a USB stick.
 
-The NSIS installer (`build:win`) shells out to wine when built off-Windows. **Without wine it fails
-partway and still leaves a ~300KB `setup.exe` in `dist/` that looks like a real artifact but is a
-broken stub** — delete it rather than shipping it.
+### Before trusting a fresh install
+
+The app has **never been run on this hardware**, and several things below are measurements,
+not assumptions. `CHECKLIST.md` carries the on-site list; the hardware-specific gates are:
+
+1. The panel's native resolution (`xrandr`) — feeds the image prescaler and the video encode.
+2. That the touch layer enumerates (`libinput list-devices`) and reports sane coordinates.
+3. That the video plays at 0.5× without pegging a core.
+4. Whether a modern Electron launches at all, which settles the pin question above.
+5. Debian's `kernel.apparmor_restrict_unprivileged_userns` — if set, it breaks Chromium's
+   namespace sandbox and surfaces as a SUID-sandbox error at launch. Prefer shipping an
+   AppArmor profile over `--no-sandbox`.

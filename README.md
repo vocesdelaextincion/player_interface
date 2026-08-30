@@ -51,9 +51,17 @@ bun node_modules/electron/install.js
 Para generar lo que se lleva al museo:
 
 ```bash
-bun run build:win:zip
+bun run build:linux
 ```
 
-Eso deja un zip en `dist/`. Se descomprime en la máquina y se corre
-`player-interface.exe`, sin instalador. Los demás targets, y por qué el proyecto está
-clavado a Electron 22, están en `ARCHITECTURE.md`.
+Eso deja un `.deb` en `dist/`, que se lleva en un pendrive y se instala con `apt` (no con
+`dpkg -i`, para que resuelva dependencias):
+
+```bash
+sudo apt install ./player-interface-<version>-amd64.deb
+```
+
+La máquina del museo es un equipo viejo con Debian, sin red, que arranca directamente en la
+aplicación. La configuración del sistema (autologin, X, el menú de arranque) vive en
+`kiosk/`, aparte del paquete. Eso, los demás targets, y por qué el proyecto sigue clavado a
+Electron 22, están en `ARCHITECTURE.md`.

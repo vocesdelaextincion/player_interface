@@ -186,3 +186,56 @@ that leaving it made the archive move a trap.
 
 Nothing in the build reads `media-archive/`. All three asset scripts take a path argument, so they
 keep working by pointing at it — the commands are in that folder's README.
+
+## Stage 12 — Linux kiosk port
+Target machine changed: no longer a Windows 8 box, now an old desktop (Gigabyte GA-M68MT-S2,
+AMD Athlon II, integrated GeForce 7025, VGA panel + USB touch, mechanical HDD, no network).
+
+- [x] `ARCHITECTURE.md` "Target machine and packaging" rewritten for the Linux target
+- [x] `README.md` deliverable switched to `build:linux` / `apt install`
+- [x] `CHECKLIST.md` hardware gates replaced (RAM, SMART, touch, decode headroom)
+- [ ] **Step 0 — measure the machine.** Nothing below is worth building first.
+      Panel resolution (`xrandr`); RAM (`free -h`); SMART (`smartctl -a`); touch enumerates
+      (`libinput list-devices`); idle video plays at 0.5x without pegging a core; and whether
+      a *modern* Electron launches at all, which settles the pin question below
+- [ ] Debian 13 netinst, no tasks selected. X11 + openbox + pipewire + python3-tk + xterm
+- [ ] Decide read-only root (see below) — this changes partitioning, so decide before installing
+- [ ] `kiosk/` in this repo: autologin drop-in, `.xinitrc`, `voces-menu`, openbox config,
+      polkit rule. Deliberately outside the `.deb`, which is reinstalled on every update
+- [ ] `src/main/index.ts`: `app:quit` → `app.exit(42)`, plus a single-instance lock
+- [ ] `electron-builder.yml`: Linux target `AppImage` → `deb`, add `maintainer`
+- [ ] `ADMIN_PIN` changed off `'2024'` (still open from Stage 6)
+- [ ] Idle video re-encoded at panel resolution instead of 1080p
+
+The port is low-risk on the app side and that is worth stating plainly: there is no `win32`
+code path anywhere in `src/`, no native modules, no serial or GPIO. Windows was only ever a
+packaging target. Almost all of this stage is OS provisioning.
+
+Two hardware facts drive the design and are written up in `ARCHITECTURE.md`. The GeForce 7025
+has no VDPAU — hardware H.264 decode starts at GeForce 8 — so the idle video is decoded
+entirely on the CPU, and encoding it at 1080p for a smaller panel is the most expensive
+avoidable thing the machine does. And nouveau is the only viable driver (NVIDIA's 304.xx
+legacy branch is long dead), which means OpenGL 2.1 with no usable GLES2, which rules out
+Wayland and `cage`. X11 is a hardware consequence here, not a preference.
+
+The Electron 22 pin outlived its reason. It existed because 22.3.27 was the last release
+supporting Windows 8; that machine is gone. It now survives only because it is known-good on
+an offline box, and because the Athlon II is K10 — SSE4a but **not** SSE4.1/4.2 — so a modern
+Electron may not start at all. Expect `SIGILL` rather than a clean error. Step 0 settles it;
+until then the pin and the `chrome108`/`node16` Vite targets stay.
+
+Admin grew outward rather than inward. Instead of a bigger in-app panel, quitting from the
+admin screen exits with **code 42**, and the shell loop in `.xinitrc` shows a four-button touch
+menu — *Voces de la extinción*, *Reiniciar*, *Apagar*, *Terminal*. Any other exit status is a
+crash and the app restarts silently. Two things fall out of that for free: crash recovery,
+which the app never had (Stage 8's note that staff restart it by hand is now false), and a
+menu that is already PIN-gated without a second PIN, since the only way to reach it is through
+the existing corner-hold gate.
+
+**Open decision: read-only root.** A USB stick as root was considered and rejected — this
+board is USB 2.0 only (~30MB/s, slower than the HDD it would replace), sticks have no real
+wear leveling under a read-write root, and one protruding from a museum kiosk is a yank away
+from an unbootable machine. But the instinct behind it is right: the kiosk gets its power cut
+at closing time every day, and a root filesystem that is never written to cannot be corrupted
+by that. `noatime`, `journald Storage=volatile`, tmpfs `/tmp`, no swap, optionally
+`overlayroot`. The payoff is power-cut immunity, not wear. Decide before partitioning.

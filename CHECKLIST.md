@@ -5,9 +5,15 @@ hours of wall-clock time — none of it can be verified from the build machine.
 
 ## Before the first install
 
-- [ ] Machine architecture checked — ship the `ia32` build if unsure, it runs on both
-- [ ] App actually launches on the Windows 8 machine (Electron 22 pin; never verified on real hardware)
-- [ ] Screen resolution noted, and backgrounds prescaled to it
+- [ ] App actually launches on the kiosk machine (Electron 22 pin; never verified on real hardware)
+- [ ] RAM checked — 4GB, so `media/` stays in page cache and the hard disk goes idle after the
+      first play (`free -h`; the integrated GPU also carves out 128–256MB)
+- [ ] Hard disk SMART checked before trusting it — `Power_On_Hours`, `Reallocated_Sector_Ct`,
+      `Current_Pending_Sector` (`sudo smartctl -a /dev/sda`)
+- [ ] Touch layer enumerates and reports sane coordinates (`libinput list-devices`, `evtest`)
+- [ ] Idle video plays at 0.5× without pegging a core — this GPU has no hardware H.264 decode
+- [ ] Screen resolution noted, and backgrounds prescaled to it — and the idle video encoded at
+      that resolution, not 1080p
       (`bun run prescale-images ../media-archive/backgrounds media/backgrounds`)
 - [ ] Admin PIN changed from the default in `src/renderer/src/admin.ts` (digits only — the keypad
       cannot enter anything else)
@@ -60,11 +66,12 @@ Enter submit, Esc cancels.
 
 ## Long-run (the reason this checklist exists)
 
-- [ ] Leave it on Idle for 4+ hours. Memory in Task Manager should be flat, not climbing.
+- [ ] Leave it on Idle for 4+ hours. Resident memory should be flat, not climbing
+      (`ps -o rss= -C player-interface`, sampled every few minutes).
 - [ ] Leave it on Active with a track looping for 1+ hour. Same.
 - [ ] **Start all four sounds on one station at once and listen.** This is the new ceiling and the
       one thing this round couldn't be checked from the build box: four concurrent FLAC decodes on
-      a Windows 8 machine. Crackle, stutter or drift means it doesn't hold — cap concurrency or
+      an Athlon II. Crackle, stutter or drift means it doesn't hold — cap concurrency or
       re-encode the catalog to a lower sample rate before reaching for anything cleverer.
 - [ ] Turn the page twenty times with sounds playing and re-check memory. Each turn builds and
       tears down four `<audio>` elements, so this is where a leak in the new engine would show.
