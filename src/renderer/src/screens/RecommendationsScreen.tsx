@@ -9,13 +9,12 @@ const HOLD_MS = 5_000
 export function RecommendationsScreen({ onDone }: { onDone: () => void }): React.JSX.Element {
   return (
     <InterstitialScreen holdMs={HOLD_MS} onDone={onDone}>
-      <h1 className={styles.title}>Antes de comenzar</h1>
+      <h1 className={styles.title}>Voces de la extinción</h1>
       <ul className={styles.list}>
-        <li className={styles.listItem}>Toca un ícono para escuchar</li>
-        <li className={styles.listItem}>Puedes combinar varios sonidos</li>
-        <li className={styles.listItem}>Las flechas cambian de estación</li>
+        <li className={styles.listItem}>Seleccioná los audios que desees escuchar</li>
+        <li className={styles.listItem}>Podés combinar los que quieras</li>
+        <li className={styles.listItem}>Cerrá los ojos y disfrutá de los sonidos del monte</li>
       </ul>
-      <p className={styles.footnote}>Tienes 90 segundos</p>
     </InterstitialScreen>
   )
 }
