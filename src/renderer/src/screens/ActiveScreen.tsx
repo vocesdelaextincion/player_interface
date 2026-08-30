@@ -17,6 +17,39 @@ const PLACEHOLDER_PAGES = 4
 // empty catalog must not hand it a fresh array on every render.
 const NO_STATION: Recording[] = []
 
+// Where the four icons land inside the menu column, as fractions of that column's box. Scattered
+// rather than stacked so the set reads as things strewn about the frame to be poked at, not as a
+// list to be worked through in order — a column invites top-to-bottom, and layering is the point.
+// Hand-placed, not generated: the spots have to stay clear of each other on a 4K panel and of the
+// pager along the top, and a seeded shuffle would have to be checked by eye anyway. One layout per
+// page, cycled, so a page turn moves the icons as well as the photograph.
+const SCATTERS: readonly (readonly { x: number; y: number }[])[] = [
+  [
+    { x: 0.18, y: 0.12 },
+    { x: 0.62, y: 0.3 },
+    { x: 0.22, y: 0.58 },
+    { x: 0.66, y: 0.82 }
+  ],
+  [
+    { x: 0.7, y: 0.14 },
+    { x: 0.24, y: 0.34 },
+    { x: 0.68, y: 0.58 },
+    { x: 0.2, y: 0.84 }
+  ],
+  [
+    { x: 0.3, y: 0.1 },
+    { x: 0.72, y: 0.38 },
+    { x: 0.16, y: 0.52 },
+    { x: 0.58, y: 0.8 }
+  ],
+  [
+    { x: 0.14, y: 0.24 },
+    { x: 0.6, y: 0.12 },
+    { x: 0.26, y: 0.7 },
+    { x: 0.7, y: 0.62 }
+  ]
+]
+
 const slideVariants: Variants = {
   enter: (dir: number) => ({ x: dir > 0 ? '100%' : '-100%', opacity: 0 }),
   center: { x: 0, opacity: 1 },
@@ -43,6 +76,7 @@ export function ActiveScreen(): React.JSX.Element {
 
   const station = pages[page] ?? NO_STATION
   const background = menuBackgrounds[page % Math.max(1, menuBackgrounds.length)]
+  const scatter = SCATTERS[page % SCATTERS.length]
 
   const { playingSlots, toggle } = useSoundboard(station)
 
@@ -115,12 +149,17 @@ export function ActiveScreen(): React.JSX.Element {
           <nav className={background?.side === 'right' ? styles.menuRight : styles.menuLeft}>
             {station.map((recording, slot) => {
               const isPlaying = playingSlots.has(slot)
+              const spot = scatter[slot % scatter.length]
+              // The column sits against whichever edge the photograph leaves free, so the scatter
+              // has to be mirrored with it or the icons crowd the edge on right-hand stations.
+              const x = background?.side === 'right' ? 1 - spot.x : spot.x
               return (
                 <button
                   // The same recording can appear on more than one page while the catalog is
                   // padded out, so the slot has to be part of the key.
                   key={`${page}-${slot}-${recording.id}`}
                   className={isPlaying ? styles.itemPlaying : styles.item}
+                  style={{ left: `${x * 100}%`, top: `${spot.y * 100}%` }}
                   onClick={() => handleToggle(slot)}
                   aria-label={recording.title}
                 >

@@ -24,6 +24,14 @@ body {
   -webkit-user-select: none;
 }
 
+/* Buttons don't inherit the page font — the UA sheet gives them its own, so any glyph inside one
+   that isn't wrapped in a styled span renders in a system face rather than Inter. Every label in
+   the app names its family, so this only reaches the bare glyphs on the carousel arrows and the
+   station discs; without it the chevrons came out smaller than Inter's and sat off the label. */
+button {
+  font-family: inherit;
+}
+
 /* Applied only in production (see main.tsx) — dev keeps a normal cursor for our own iteration. */
 body.kiosk,
 body.kiosk * {

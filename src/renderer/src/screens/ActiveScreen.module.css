@@ -55,15 +55,16 @@
   background: rgb(var(--rgb-black) / 0.45);
 }
 
+/* The box the icons are scattered inside, not a stack: each one is placed against it from the
+   percentages in ActiveScreen. It stops short of the top so the pager keeps its strip, and short
+   of mid-screen so nothing wanders into the column the etiqueta owns. */
 .menuLeft,
 .menuRight {
   position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
+  top: 15vh;
+  bottom: 8vh;
+  width: 42vw;
   z-index: 2;
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
 }
 
 .menuLeft {
@@ -79,11 +80,14 @@
    pressable shapes read as a set of things to try together, which is what layering asks for. */
 .item,
 .itemPlaying {
+  position: absolute;
+  /* left/top come from the scatter table and name the centre of the disc, not its corner. */
+  transform: translate(-50%, -50%);
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 88px;
-  height: 88px;
+  width: 112px;
+  height: 112px;
   min-width: var(--touch-target-min);
   min-height: var(--touch-target-min);
   border: none;
@@ -103,7 +107,7 @@
 }
 
 .itemGlyph {
-  font-size: 26px;
+  font-size: 34px;
   line-height: 1;
 }
 
@@ -141,9 +145,15 @@
   cursor: pointer;
 }
 
+/* Optical centring, not box centring. `align-items: center` lines up the two line boxes, but ink
+   sits where the font puts it: Inter centres its caps exactly on the middle of the line box (its
+   ascent/descent are drawn so cap-height/2 lands there), while the ‹ › ink centre sits 0.063em
+   lower. So the label is already true and only the chevron needs lifting — by that same 0.063em,
+   in em so it holds if the glyph is resized. */
 .arrowGlyph {
   font-size: 34px;
   line-height: 1;
+  transform: translateY(-0.063em);
 }
 
 .arrowLabel {
